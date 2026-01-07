@@ -1,0 +1,53 @@
+# --- JAVA / MAVEN ---
+target/
+*.class
+*.war
+*.ear
+*.jar
+.mvn/wrapper/maven-wrapper.jar
+**/target/
+
+# --- IDEs (STS, IntelliJ, NetBeans, VS Code) ---
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+.idea
+*.iws
+*.iml
+*.ipr
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+build/
+**/build/
+.vscode/
+
+# --- FRONTEND (React / Node) ---
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+
+# --- CONFIGURACIÓN Y SECRETOS (Seguridad) ---
+.env
+*.log
+HELP.md
+backend/.env
+backend/src/main/resources/application-local.properties
+backend/src/main/resources/application-private.properties
+
+# --- SISTEMA ---
+.DS_Store
+Thumbs.db
