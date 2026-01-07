@@ -1,5 +1,6 @@
 package com.Ecommerce.PruebaE_Commerce.model;
-import jakarta.persistence.*;  
+
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
@@ -17,7 +18,7 @@ public class Usuario {
     @Column(nullable = false)
     private String apellido;
 
-    @Column(unique=true,nullable = false)
+    @Column(unique = true, nullable = false)
     private String email;
 
     @Column(nullable = false)

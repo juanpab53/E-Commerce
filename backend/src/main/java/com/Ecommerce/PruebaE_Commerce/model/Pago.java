@@ -1,4 +1,5 @@
 package com.Ecommerce.PruebaE_Commerce.model;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
