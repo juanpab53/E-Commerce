@@ -6,5 +6,5 @@ import com.Ecommerce.PruebaE_Commerce.model.Producto;
 
 public interface ProductRepository extends JpaRepository<Producto, Long> {
     List<Producto> findByNombreContainingIgnoreCase(String nombre);
-    List<Producto> findByCategoria(Long categoria);
+    List<Producto> findByCategoria(Long id);
 }
