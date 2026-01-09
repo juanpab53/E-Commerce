@@ -18,7 +18,7 @@ public class ProductoService {
     }
 
     public List<Producto> listarPorCategoria(Long idCategoria) {
-        return productRepository.findByCategoria(idCategoria);
+        return productRepository.findByCategoriaId(idCategoria);
     }
 
     public Producto actualizarStock(Producto producto) {

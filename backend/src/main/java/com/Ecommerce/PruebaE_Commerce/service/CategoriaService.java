@@ -23,7 +23,7 @@ public class CategoriaService {
         categoriaRepository.deleteById(id);
     }
 
-    public List<Categoria> buscarPorCategoria(String categoria){
-        return categoriaRepository.findByCategoriaIgnoreCase(categoria);
+    public List<Categoria> buscarPorCategoria(String nombre){
+        return categoriaRepository.findByNombreIgnoreCase(nombre);
     }
 }
