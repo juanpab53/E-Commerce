@@ -6,5 +6,5 @@ import com.Ecommerce.PruebaE_Commerce.model.Usuario;
 
 @Repository
 public interface UserRepository extends JpaRepository<Usuario, Long> {
-
+    Usuario findByEmail(String email);
 }

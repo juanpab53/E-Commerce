@@ -29,6 +29,11 @@ public class UsuarioService {
         return usuarioRepository.findById(id).orElse(null);
     }
 
+    public Usuario buscarPorEmail(String email) {
+        return usuarioRepository.findByEmail(email);
+    }
+
+
     public Usuario actualizarUsuario(Usuario usuario) {
         return usuarioRepository.save(usuario);
     }
