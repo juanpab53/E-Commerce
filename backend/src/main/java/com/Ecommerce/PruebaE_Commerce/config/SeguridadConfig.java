@@ -2,6 +2,7 @@ package com.Ecommerce.PruebaE_Commerce.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -13,16 +14,18 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SeguridadConfig {
 
-    //Configuración para el acceso publico al endpoint de registro de usuarios
+    // Configuración para el acceso publico al endpoint de registro de usuarios
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/usuarios/registro").permitAll()
-                .anyRequest().authenticated()
-            )
-            .httpBasic(Customizer.withDefaults());
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.POST, "/auth/login", "/usuarios/registro").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/productos/**", "/categorias/**").permitAll()
+                        .anyRequest().authenticated()
+
+                )
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }

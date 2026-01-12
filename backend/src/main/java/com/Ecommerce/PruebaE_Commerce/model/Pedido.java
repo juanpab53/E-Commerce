@@ -3,6 +3,7 @@ package com.Ecommerce.PruebaE_Commerce.model;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 @Data
 @Entity
@@ -16,7 +17,7 @@ public class Pedido {
     @Enumerated(EnumType.STRING)
     private Estado estado;
 
-    @Column(nullable = false)
+    @Column(name = "fecha_pedido", nullable = false)
     private String fechaPedido;
 
     private double total;
@@ -25,6 +26,7 @@ public class Pedido {
     @JoinColumn(name = "id_usuario", nullable = false)
     private Usuario usuario;
 
+    @JsonProperty("detalles")
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)
     private List<DetallePedido> detallePedidos;
 }
