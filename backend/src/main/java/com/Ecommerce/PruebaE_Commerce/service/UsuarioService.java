@@ -4,6 +4,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import com.Ecommerce.PruebaE_Commerce.model.Rol;
 import com.Ecommerce.PruebaE_Commerce.model.Usuario;
 import com.Ecommerce.PruebaE_Commerce.repository.UserRepository;
 
@@ -18,6 +20,7 @@ public class UsuarioService {
     public Usuario registrarUsuario(Usuario usuario) {
         String hash = passwordEncoder.encode(usuario.getPassword());
         usuario.setPassword(hash);
+        usuario.setRol(Rol.CLIENTE);
         return usuarioRepository.save(usuario);
     }
 
