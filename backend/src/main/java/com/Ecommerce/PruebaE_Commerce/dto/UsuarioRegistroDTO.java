@@ -8,6 +8,9 @@ public record UsuarioRegistroDTO(
     @NotBlank(message = "El nombre es obligatorio")
     String nombre,
 
+    @NotBlank(message = "El apellido es obligatorio")
+    String apellido,
+
     @NotBlank(message = "El email es obligatorio")
     @Email(message = "Formato de email inválido")
     String email,
@@ -16,6 +19,12 @@ public record UsuarioRegistroDTO(
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
     String password,
 
-    @NotBlank(message = "La dirección es obligatoria")
-    String direccion
-) {} 
+    @NotBlank 
+    String pais,
+
+    @NotBlank 
+    String ciudad,
+
+    @NotBlank 
+    String calle
+) {}

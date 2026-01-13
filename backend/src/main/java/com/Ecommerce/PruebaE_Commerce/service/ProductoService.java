@@ -1,40 +1,110 @@
 package com.Ecommerce.PruebaE_Commerce.service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.Ecommerce.PruebaE_Commerce.dto.ProductoDTO;
+import com.Ecommerce.PruebaE_Commerce.dto.ProductoResponseDTO;
+import com.Ecommerce.PruebaE_Commerce.exceptions.BusinessLogicException;
+import com.Ecommerce.PruebaE_Commerce.exceptions.ResourceNotFoundException;
+import com.Ecommerce.PruebaE_Commerce.model.Categoria;
 import com.Ecommerce.PruebaE_Commerce.model.Producto;
+import com.Ecommerce.PruebaE_Commerce.repository.CategoriaRepository;
+import com.Ecommerce.PruebaE_Commerce.repository.DetallePedidoRepository;
 import com.Ecommerce.PruebaE_Commerce.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProductoService {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<Producto> buscarPorNombre(String nombre) {
-        return productRepository.findByNombreContainingIgnoreCase(nombre);
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
+    @Autowired
+    private DetallePedidoRepository detallePedidoRepository;
+
+    @Transactional
+    public ProductoResponseDTO crear(ProductoDTO productoDto) {
+        // EXCEPCIÓN DE RECURSO: La categoría padre debe existir
+        Categoria categoria = categoriaRepository.findById(productoDto.categoriaId())
+                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el producto: Categoría no encontrada con ID: " + productoDto.categoriaId()));
+        
+        Producto producto = new Producto();
+        producto.setNombre(productoDto.nombre());
+        producto.setDescripcion(productoDto.descripcion());
+        producto.setPrecio(productoDto.precio());
+        producto.setCantidad(productoDto.cantidad());
+        producto.setCategoria(categoria);
+
+        return mapearAResponse(productRepository.save(producto));
     }
 
-    public List<Producto> listarPorCategoria(Long idCategoria) {
-        return productRepository.findByCategoriaId(idCategoria);
+    @Transactional
+    private Producto encontrarProducto(Long id) {
+        return productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
     }
 
-    public List<Producto> listarTodos() {
-        return productRepository.findAll();
+    @Transactional
+    public List<ProductoResponseDTO> listarTodos() {
+        return productRepository.findAll().stream()
+                .map(this::mapearAResponse).toList();
     }
 
-    public Producto actualizarStock(Producto producto) {
-        return productRepository.save(producto);
+    @Transactional
+    public ProductoResponseDTO buscarPorId(Long id) {
+        Producto p = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+        return mapearAResponse(p);
     }
 
-    public Producto creaProducto(Producto producto){
-        return productRepository.save(producto);
+    @Transactional
+    public List<ProductoResponseDTO> buscarPorNombre(String nombre) {
+        return productRepository.findByNombreContainingIgnoreCase(nombre).stream()
+                .map(this::mapearAResponse).toList();
     }
 
-    public void eliminarProducto(Long id) {
+    @Transactional
+    public List<ProductoResponseDTO> listarPorCategoria(Long categoriaId) {
+        if (!categoriaRepository.existsById(categoriaId)) {
+            throw new ResourceNotFoundException("No se pueden listar productos: Categoría no encontrada con ID: " + categoriaId);
+        }
+        return productRepository.findByCategoriaId(categoriaId).stream()
+                .map(this::mapearAResponse).toList();
+    }
+
+    @Transactional
+    public ProductoResponseDTO actualizarStock(Long id, Integer nuevoStock) {
+        // EXCEPCIÓN DE NEGOCIO: El stock tiene una regla aritmética
+        if (nuevoStock < 0) {
+            throw new BusinessLogicException("Error de inventario: El stock no puede ser negativo (" + nuevoStock + ")");
+        }
+        Producto producto = encontrarProducto(id);
+        producto.setCantidad(nuevoStock);
+        return mapearAResponse(productRepository.save(producto));
+    }
+
+    @Transactional
+    public void eliminar(Long id) {
+        // 1. Validar existencia
+        if (!productRepository.existsById(id)) {
+            throw new ResourceNotFoundException("No se puede eliminar: Producto no encontrado con ID: " + id);
+        }
+
+        // 2. Validar integridad referencial (Regla de Negocio)
+        if (detallePedidoRepository.existsByProductoId(id)) {
+            throw new BusinessLogicException("Restricción de integridad: El producto con ID " + id + 
+                                           " tiene historial de ventas y no puede ser eliminado físicamente.");
+        }
+
         productRepository.deleteById(id);
     }
 
+    private ProductoResponseDTO mapearAResponse(Producto p) {
+        return new ProductoResponseDTO(
+                p.getId(), p.getNombre(), p.getDescripcion(),
+                p.getPrecio(), p.getCantidad(), p.getCategoria().getNombre());
+    }
 }

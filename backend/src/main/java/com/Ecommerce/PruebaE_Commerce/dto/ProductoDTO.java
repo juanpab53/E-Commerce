@@ -15,9 +15,9 @@ public record ProductoDTO(
     @Positive(message = "El precio debe ser mayor a cero")
     Double precio,
 
-    @NotNull(message = "El stock es obligatorio")
+    @NotNull(message = "La cantidad es obligatoria")
     @Min(value = 0, message = "El stock no puede ser negativo")
-    Integer stock,
+    Integer cantidad,
 
     @NotNull(message = "Debe especificar el ID de la categoría")
     Long categoriaId

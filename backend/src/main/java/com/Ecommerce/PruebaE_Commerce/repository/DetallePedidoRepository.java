@@ -7,4 +7,5 @@ import com.Ecommerce.PruebaE_Commerce.model.DetallePedido;
 
 public interface DetallePedidoRepository extends JpaRepository<DetallePedido, Long> {
     List<DetallePedido> findByPedidoId(Long idPedido);
+    boolean existsByProductoId(Long id);
 }
