@@ -2,20 +2,16 @@ package com.Ecommerce.PruebaE_Commerce.controller;
 
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.Ecommerce.PruebaE_Commerce.model.Usuario;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.Ecommerce.PruebaE_Commerce.dto.UsuarioRegistroDTO;
+import com.Ecommerce.PruebaE_Commerce.dto.UsuarioResponseDTO;
 import com.Ecommerce.PruebaE_Commerce.service.UsuarioService;
+import jakarta.validation.Valid;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*") 
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
@@ -23,28 +19,33 @@ public class UsuarioController {
     private UsuarioService usuarioService;
 
     @PostMapping("/registro")
-    public Usuario registrar(@RequestBody Usuario usuario) {
-        return usuarioService.registrarUsuario(usuario);
+    public ResponseEntity<UsuarioResponseDTO> registrar(@Valid @RequestBody UsuarioRegistroDTO usuarioDto) {
+        UsuarioResponseDTO nuevoUsuario = usuarioService.registrarUsuario(usuarioDto);
+        return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
     }
 
     @GetMapping
-    public List<Usuario> listar() {
-        return usuarioService.listarUsuarios();
+    public ResponseEntity<List<UsuarioResponseDTO>> listar() {
+        List<UsuarioResponseDTO> usuarios = usuarioService.listarUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 
     @GetMapping("/{id}")
-    public Usuario buscarPorId(@PathVariable Long id) {
-        return usuarioService.obtenerUsuarioPorId(id);
+    public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(usuarioService.obtenerUsuarioPorId(id));
     }
 
     @PutMapping("/{id}")
-    public Usuario actualizar(@PathVariable Long id, @RequestBody Usuario usuario) {
-        usuario.setId(id);
-        return usuarioService.actualizarUsuario(usuario);
+    public ResponseEntity<UsuarioResponseDTO> actualizar(
+            @PathVariable Long id, 
+            @Valid @RequestBody UsuarioRegistroDTO usuarioDto) {
+        UsuarioResponseDTO actualizado = usuarioService.actualizar(id, usuarioDto);
+        return ResponseEntity.ok(actualizado);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
+    public ResponseEntity<Void> eliminar(@PathVariable Long id) {
         usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 }
