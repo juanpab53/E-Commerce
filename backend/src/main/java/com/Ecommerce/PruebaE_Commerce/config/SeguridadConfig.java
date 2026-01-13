@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 @EnableWebSecurity
 public class SeguridadConfig {
 
-    // Configuración para el acceso publico al endpoint de registro de usuarios
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -22,6 +21,8 @@ public class SeguridadConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(HttpMethod.POST, "/auth/login", "/usuarios/registro").permitAll()
                         .requestMatchers(HttpMethod.GET, "/productos/**", "/categorias/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/productos/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/productos/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
 
                 )

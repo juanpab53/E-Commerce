@@ -7,7 +7,7 @@ import com.Ecommerce.PruebaE_Commerce.repository.UserRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +19,7 @@ public class AuthController {
     private UserRepository usuarioRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+private PasswordEncoder passwordEncoder; 
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
