@@ -26,7 +26,6 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO registrarUsuario(UsuarioRegistroDTO usuarioDto) {
-        // EXCEPCIÓN DE NEGOCIO: Validar email duplicado
         if (usuarioRepository.existsByEmail(usuarioDto.email())) {
             throw new BusinessLogicException("El email '" + usuarioDto.email() + "' ya está registrado.");
         }
@@ -59,7 +58,6 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO obtenerUsuarioPorId(Long id) {
-        // EXCEPCIÓN DE RECURSO: No encontrado
         Usuario usuario = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
         return mapearAResponse(usuario);
@@ -67,7 +65,6 @@ public class UsuarioService {
 
     @Transactional
     public UsuarioResponseDTO buscarPorEmail(String email) {
-        // EXCEPCIÓN DE RECURSO: No encontrado
         Usuario usuario = usuarioRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("No se encontró un usuario con el email: " + email));
         return mapearAResponse(usuario);
@@ -78,7 +75,6 @@ public class UsuarioService {
         Usuario usuarioExistente = usuarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Usuario no encontrado con ID: " + id));
 
-        // Validar si el nuevo email ya lo tiene otro usuario
         if (!usuarioExistente.getEmail().equals(dto.email()) && usuarioRepository.existsByEmail(dto.email())) {
             throw new BusinessLogicException("No se puede actualizar: El email '" + dto.email() + "' ya está en uso por otro usuario.");
         }

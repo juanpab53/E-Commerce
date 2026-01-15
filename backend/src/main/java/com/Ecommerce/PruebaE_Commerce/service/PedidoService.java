@@ -35,7 +35,6 @@ public class PedidoService {
 
     @Transactional
     public PedidoResponseDTO crearPedido(PedidoDTO pedido) {
-        // RECURSO: Validar usuario
         Usuario usuario = userRepository.findById(pedido.usuarioID())
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el pedido: Usuario no encontrado con ID: " + pedido.usuarioID()));
 
@@ -48,17 +47,14 @@ public class PedidoService {
         double total = 0;
 
         for (DetallePedidoDTO detalle : pedido.detalles()) {
-            // RECURSO: Validar existencia del producto
             Producto productoDB = productRepository.findById(detalle.productoId())
                     .orElseThrow(() -> new ResourceNotFoundException("Error en el detalle: Producto no encontrado con ID: " + detalle.productoId()));
 
-            // NEGOCIO: Validar disponibilidad de stock
             if (productoDB.getCantidad() < detalle.cantidad()) {
                 throw new BusinessLogicException("Stock insuficiente para el producto '" + productoDB.getNombre() + 
                                                "'. Disponible: " + productoDB.getCantidad() + ", Solicitado: " + detalle.cantidad());
             }
 
-            // Descontar stock
             productoDB.setCantidad(productoDB.getCantidad() - detalle.cantidad());
             productRepository.save(productoDB);
 
@@ -88,7 +84,6 @@ public class PedidoService {
 
     @Transactional
     public List<PedidoResponseDTO> listarPedidosPorUsuario(Long usuarioId) {
-        // Opcional: Podrías validar si el usuario existe antes de listar
         return pedidoRepository.findByUsuarioId(usuarioId).stream()
                 .map(this::mapearAResponse)
                 .collect(Collectors.toList());
@@ -106,7 +101,6 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(pedidoId)
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede cambiar el estado: Pedido no encontrado con ID: " + pedidoId));
 
-        // NEGOCIO: Evitar cambios si ya está cancelado o si se requiere lógica de reintegro
         if (nuevoEstado == Estado.CANCELADO && pedido.getEstado() != Estado.CANCELADO) {
             devolverStock(pedido);
         }
@@ -120,7 +114,6 @@ public class PedidoService {
         Pedido pedido = pedidoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede cancelar: Pedido no encontrado con ID: " + id));
 
-        // NEGOCIO: Validar transiciones de estado permitidas
         if (pedido.getEstado() == Estado.ENVIADO || pedido.getEstado() == Estado.ENTREGADO) {
             throw new BusinessLogicException("Acción no permitida: No se puede cancelar un pedido que ya ha sido " + pedido.getEstado());
         }

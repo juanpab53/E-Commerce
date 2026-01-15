@@ -5,7 +5,6 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
-
 import com.Ecommerce.PruebaE_Commerce.dto.UsuarioRegistroDTO;
 import com.Ecommerce.PruebaE_Commerce.dto.UsuarioResponseDTO;
 import com.Ecommerce.PruebaE_Commerce.exceptions.BusinessLogicException;
@@ -53,8 +52,8 @@ public class UsuarioServiceTest {
         usuarioEjemplo.setApellido("Aparicio");
         usuarioEjemplo.setEmail("juan@example.com");
         usuarioEjemplo.setPassword("hash_encoded");
-        usuarioEjemplo.setRol(Rol.CLIENTE); // Asegúrate de asignar un Rol
-        usuarioEjemplo.setDireccion(direccionEjemplo); // Asigna la dirección
+        usuarioEjemplo.setRol(Rol.CLIENTE); 
+        usuarioEjemplo.setDireccion(direccionEjemplo); 
 
         registroDTO = new UsuarioRegistroDTO(
                 "Juan", "Aparicio", "juan@example.com", "password123",

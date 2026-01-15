@@ -24,7 +24,6 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponseDTO crear(CategoriaDTO dto) {
-        // NEGOCIO: Evitar nombres duplicados
         if (categoriaRepository.existsByNombre(dto.nombre())) {
             throw new BusinessLogicException("Conflicto de datos: La categoría con el nombre '" + dto.nombre() + "' ya existe.");
         }
@@ -44,7 +43,6 @@ public class CategoriaService {
 
     @Transactional
     public CategoriaResponseDTO buscarPorId(Long id) {
-        // RECURSO: Not Found (404)
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con ID: " + id));
         return mapearAResponse(categoria);
@@ -55,7 +53,6 @@ public class CategoriaService {
         Categoria categoriaExistente = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Categoría no encontrada con ID: " + id));
         
-        // Opcional: Validar que el nuevo nombre no choque con otra categoría existente
         if (!categoriaExistente.getNombre().equals(dto.nombre()) && categoriaRepository.existsByNombre(dto.nombre())) {
             throw new BusinessLogicException("No se puede actualizar: Ya existe otra categoría con el nombre '" + dto.nombre() + "'.");
         }
@@ -67,11 +64,9 @@ public class CategoriaService {
 
     @Transactional
     public void eliminar(Long id) {
-        // RECURSO: Validar existencia antes de intentar cualquier lógica
         Categoria categoria = categoriaRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Categoría no encontrada con ID: " + id));
 
-        // NEGOCIO: Integridad referencial (No dejar productos huérfanos)
         if (productoRepository.existsByCategoriaId(id)) {
             throw new BusinessLogicException("Restricción de integridad: No se puede eliminar la categoría '" + 
                                            categoria.getNombre() + "' porque tiene productos asociados.");

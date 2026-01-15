@@ -26,33 +26,27 @@ public class PagoService {
 
     @Transactional 
     public PagoResponseDTO processarPago(PagoDTO dtopago) {
-        // RECURSO: Validar que el pedido exista
         Pedido pedido = pedidoRepository.findById(dtopago.pedidoId())
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede procesar el pago: Pedido no encontrado con ID: " + dtopago.pedidoId()));
         
-        // NEGOCIO: Validar que el pedido no esté ya pagado
         if (pedido.getEstado() == Estado.PAGADO) {
             throw new BusinessLogicException("Operación inválida: El pedido con ID " + dtopago.pedidoId() + " ya ha sido pagado.");
         }
 
-        // NEGOCIO: Validar que el pedido no esté cancelado
         if(pedido.getEstado() == Estado.CANCELADO){
             throw new BusinessLogicException("Operación inválida: No se puede pagar el pedido " + dtopago.pedidoId() + " porque se encuentra CANCELADO.");
         }
 
-        // NEGOCIO: Evitar duplicidad de registros de pago
         pagoRepository.findByPedidoId(dtopago.pedidoId()).ifPresent(p -> {
             throw new BusinessLogicException("Conflicto: Ya existe un registro de pago asociado al pedido ID: " + dtopago.pedidoId());
         });
 
-        // Crear registro de pago
         Pago pago = new Pago();
         pago.setPedido(pedido);
         pago.setMonto(pedido.getTotal());
         pago.setFechaPago(LocalDateTime.now().toString());
         pago.setMetodoPago(dtopago.metodoPago());
         
-        // Actualizar estado del pedido
         pedido.setEstado(Estado.PAGADO);
         pedidoRepository.save(pedido);
 

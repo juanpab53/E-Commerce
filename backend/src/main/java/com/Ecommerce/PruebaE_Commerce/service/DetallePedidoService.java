@@ -17,7 +17,6 @@ public class DetallePedidoService {
 
     @Transactional
     public DetallePedidoResponseDTO buscarPorId(Long id) {
-        // RECURSO: Cambiamos RuntimeException por ResourceNotFoundException
         DetallePedido detalle = detalleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Detalle de pedido no encontrado con ID: " + id));
         return mapearAResponse(detalle);
@@ -25,7 +24,6 @@ public class DetallePedidoService {
 
     @Transactional
     public List<DetallePedidoResponseDTO> listarPorPedido(Long pedidoId) {
-        // Nota: Si la lista viene vacía, simplemente devolvemos la lista vacía (es el comportamiento estándar de una API)
         return detalleRepository.findByPedidoId(pedidoId).stream()
                 .map(this::mapearAResponse)
                 .collect(Collectors.toList());

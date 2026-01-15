@@ -27,7 +27,6 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponseDTO crear(ProductoDTO productoDto) {
-        // EXCEPCIÓN DE RECURSO: La categoría padre debe existir
         Categoria categoria = categoriaRepository.findById(productoDto.categoriaId())
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el producto: Categoría no encontrada con ID: " + productoDto.categoriaId()));
         
@@ -77,7 +76,6 @@ public class ProductoService {
 
     @Transactional
     public ProductoResponseDTO actualizarStock(Long id, Integer nuevoStock) {
-        // EXCEPCIÓN DE NEGOCIO: El stock tiene una regla aritmética
         if (nuevoStock < 0) {
             throw new BusinessLogicException("Error de inventario: El stock no puede ser negativo (" + nuevoStock + ")");
         }
@@ -88,12 +86,10 @@ public class ProductoService {
 
     @Transactional
     public void eliminar(Long id) {
-        // 1. Validar existencia
         if (!productRepository.existsById(id)) {
             throw new ResourceNotFoundException("No se puede eliminar: Producto no encontrado con ID: " + id);
         }
 
-        // 2. Validar integridad referencial (Regla de Negocio)
         if (detallePedidoRepository.existsByProductoId(id)) {
             throw new BusinessLogicException("Restricción de integridad: El producto con ID " + id + 
                                            " tiene historial de ventas y no puede ser eliminado físicamente.");
