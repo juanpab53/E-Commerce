@@ -23,6 +23,11 @@ public class SeguridadConfig {
                         .requestMatchers(HttpMethod.GET, "/productos/**", "/categorias/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/productos/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/productos/**").hasRole("ADMIN")
+                        .requestMatchers(
+                                "/v3/api-docs/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html")
+                        .permitAll()
                         .anyRequest().authenticated()
 
                 )
