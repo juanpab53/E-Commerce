@@ -24,6 +24,14 @@ public class UsuarioService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public boolean validarCredenciales(String email, String password) {
+        return usuarioRepository.findByEmail(email)
+                .map(usuario -> {
+                    return passwordEncoder.matches(password, usuario.getPassword());
+                })
+                .orElse(false);
+    }
+
     @Transactional
     public UsuarioResponseDTO registrarUsuario(UsuarioRegistroDTO usuarioDto) {
         if (usuarioRepository.existsByEmail(usuarioDto.email())) {
@@ -73,16 +81,18 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO actualizar(Long id, UsuarioRegistroDTO dto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "No se puede actualizar: Usuario no encontrado con ID: " + id));
 
         if (!usuarioExistente.getEmail().equals(dto.email()) && usuarioRepository.existsByEmail(dto.email())) {
-            throw new BusinessLogicException("No se puede actualizar: El email '" + dto.email() + "' ya está en uso por otro usuario.");
+            throw new BusinessLogicException(
+                    "No se puede actualizar: El email '" + dto.email() + "' ya está en uso por otro usuario.");
         }
 
         usuarioExistente.setNombre(dto.nombre());
-        usuarioExistente.setApellido(dto.apellido()); 
+        usuarioExistente.setApellido(dto.apellido());
         usuarioExistente.setEmail(dto.email());
-        
+
         if (dto.password() != null && !dto.password().isBlank()) {
             usuarioExistente.setPassword(passwordEncoder.encode(dto.password()));
         }
