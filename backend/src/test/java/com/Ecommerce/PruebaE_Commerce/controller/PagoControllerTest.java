@@ -62,13 +62,6 @@ public class PagoControllerTest {
         mockMvc.perform(post("/pagos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pagoDto)))
-                .andDo(result -> {
-                    if (result.getResponse().getStatus() == 500) {
-                        String errorString = "ERROR DETECTADO: " +
-                                result.getResolvedException().getMessage();
-                        System.out.println(errorString);
-                    }
-                })
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.estadoPedidoActual").value("PAGADO"));
     }

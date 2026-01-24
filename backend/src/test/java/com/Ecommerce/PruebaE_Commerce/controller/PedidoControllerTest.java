@@ -66,12 +66,6 @@ public class PedidoControllerTest {
         mockMvc.perform(post("/pedidos")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(pedidoDto)))
-                .andDo(result -> {
-                    if (result.getResponse().getStatus() == 500) {
-                        String errorString = "ERROR DETECTADO: " + result.getResolvedException().getMessage();
-                        System.out.println(errorString);
-                    }
-                })
                 .andExpect(status().isCreated());
     }
 
