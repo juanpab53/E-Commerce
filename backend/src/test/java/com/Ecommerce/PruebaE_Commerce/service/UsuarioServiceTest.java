@@ -85,6 +85,40 @@ public class UsuarioServiceTest {
         verify(userRepository, never()).save(any(Usuario.class));
     }
 
+    // --- PRUEBAS DE VALIDACIÓN ---
+
+    @Test
+    @DisplayName("Debe validar credenciales correctamente")
+    void validarCredencialesExito() {
+        when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(usuarioEjemplo));
+        when(passwordEncoder.matches("password123", "hash_encoded")).thenReturn(true);
+
+        boolean esValido = usuarioService.validarCredenciales("juan@example.com", "password123");
+
+        assertTrue(esValido);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false si la contraseña es incorrecta")
+    void validarCredencialesFallaPassword() {
+        when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(usuarioEjemplo));
+        when(passwordEncoder.matches("wrongpass", "hash_encoded")).thenReturn(false);
+
+        boolean esValido = usuarioService.validarCredenciales("juan@example.com", "wrongpass");
+
+        assertFalse(esValido);
+    }
+
+    @Test
+    @DisplayName("Debe retornar false si el usuario no existe para validar credenciales")
+    void validarCredencialesFallaUsuarioNoExiste() {
+        when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
+
+        boolean esValido = usuarioService.validarCredenciales("noexiste@example.com", "password123");
+
+        assertFalse(esValido);
+    }
+
     // --- PRUEBAS DE BÚSQUEDA ---
 
     @Test
@@ -116,6 +150,25 @@ public class UsuarioServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> usuarioService.obtenerUsuarioPorId(99L));
     }
 
+    @Test
+    @DisplayName("Debe buscar usuario por email exitosamente")
+    void buscarPorEmailExito() {
+        when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(usuarioEjemplo));
+
+        UsuarioResponseDTO resultado = usuarioService.buscarPorEmail("juan@example.com");
+
+        assertNotNull(resultado);
+        assertEquals("juan@example.com", resultado.email());
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción si no encuentra usuario por email")
+    void buscarPorEmailFalla() {
+        when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> usuarioService.buscarPorEmail("noexiste@example.com"));
+    }
+
     // --- PRUEBAS DE ACTUALIZACIÓN ---
 
     @Test
@@ -128,6 +181,29 @@ public class UsuarioServiceTest {
 
         assertNotNull(resultado);
         verify(userRepository).save(usuarioEjemplo);
+    }
+
+    @Test
+    @DisplayName("Debe fallar actualización si el nuevo email ya está en uso por otro usuario")
+    void actualizarUsuarioFallaEmailDuplicado() {
+        UsuarioRegistroDTO dtoConNuevoEmail = new UsuarioRegistroDTO(
+                "Juan", "Aparicio", "otro@example.com", "password123",
+                "Calle 123", "Medellin", "Colombia");
+
+        when(userRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo));
+        when(userRepository.existsByEmail("otro@example.com")).thenReturn(true);
+
+        assertThrows(BusinessLogicException.class, () -> usuarioService.actualizar(1L, dtoConNuevoEmail));
+        verify(userRepository, never()).save(any(Usuario.class));
+    }
+
+    @Test
+    @DisplayName("Debe lanzar excepción al actualizar si el usuario no existe")
+    void actualizarUsuarioFallaIdNoEncontrado() {
+        when(userRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> usuarioService.actualizar(99L, registroDTO));
+        verify(userRepository, never()).save(any(Usuario.class));
     }
 
     // --- PRUEBAS DE ELIMINACIÓN ---

@@ -49,7 +49,7 @@ public class PedidoController {
         return ResponseEntity.ok(pedidoService.cambiarEstado(id, nuevoEstado));
     }
 
-    @PostMapping("/{id}/cancelar")
+    @DeleteMapping("/{id}/cancelar")
     public ResponseEntity<PedidoResponseDTO> cancelar(@PathVariable Long id) {
         return ResponseEntity.ok(pedidoService.cancelarPedido(id));
     }

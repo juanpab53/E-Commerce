@@ -21,7 +21,7 @@ public class PagoController {
 
     @PostMapping
     public ResponseEntity<PagoResponseDTO> procesar(@Valid @RequestBody PagoDTO pagoDto) {
-        PagoResponseDTO respuesta = pagoService.processarPago(pagoDto);
+        PagoResponseDTO respuesta = pagoService.procesarPago(pagoDto);
         return new ResponseEntity<>(respuesta, HttpStatus.CREATED);
     }
 

@@ -58,7 +58,8 @@ public class PedidoControllerTest {
         PedidoDTO pedidoDto = new PedidoDTO(1L, detalles);
 
         DetallePedidoResponseDTO detRes = new DetallePedidoResponseDTO(1L, 1L, "Producto Prueba", 2, 50.0, 100.0);
-        PedidoResponseDTO respuestaEsperada = new PedidoResponseDTO(1L, LocalDateTime.now().toString(), "PENDIENTE", 100.0, List.of(detRes));
+        PedidoResponseDTO respuestaEsperada = new PedidoResponseDTO(1L, LocalDateTime.now().toString(), "PENDIENTE",
+                100.0, List.of(detRes));
 
         when(pedidoService.crearPedido(any(PedidoDTO.class))).thenReturn(respuestaEsperada);
 
@@ -67,14 +68,8 @@ public class PedidoControllerTest {
                 .content(objectMapper.writeValueAsString(pedidoDto)))
                 .andDo(result -> {
                     if (result.getResponse().getStatus() == 500) {
-                        System.out.println("ERROR DETECTADO: \n\n\\n" + //
-                                "\\n" + //
-                                "\\n" + //
-                                "\\n" + //
-                                "\\n" + //
-                                "\\n" + //
-                                "" + result.getResolvedException().getMessage());
-                        result.getResolvedException().printStackTrace();
+                        String errorString = "ERROR DETECTADO: " + result.getResolvedException().getMessage();
+                        System.out.println(errorString);
                     }
                 })
                 .andExpect(status().isCreated());
@@ -101,11 +96,13 @@ public class PedidoControllerTest {
     @Test
     @DisplayName("PATCH /pedidos/{id}/estado - Actualizar estado")
     void actualizarEstado() throws Exception {
-        PedidoResponseDTO res = new PedidoResponseDTO(1L, LocalDateTime.now().toString(), "ENVIADO", 500.0, List.of());
+        DetallePedidoResponseDTO detRes = new DetallePedidoResponseDTO(1L, 1L, "Producto Prueba", 2, 50.0, 100.0);
+        PedidoResponseDTO res = new PedidoResponseDTO(1L, LocalDateTime.now().toString(), "ENVIADO", 500.0, List.of(detRes));
+
         when(pedidoService.cambiarEstado(anyLong(), any(Estado.class))).thenReturn(res);
 
         mockMvc.perform(patch("/pedidos/1/estado")
-                .param("estado", "ENVIADO"))
+                .param("nuevoEstado", "ENVIADO"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.estado").value("ENVIADO"));
     }
@@ -113,7 +110,20 @@ public class PedidoControllerTest {
     @Test
     @DisplayName("DELETE /pedidos/{id} - Cancelar/Eliminar pedido")
     void eliminarPedido() throws Exception {
-        mockMvc.perform(delete("/pedidos/1"))
-                .andExpect(status().isNoContent());
+        mockMvc.perform(delete("/pedidos/1/cancelar"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("GET /pedidos/{id} - Buscar por ID")
+    void buscarPorId() throws Exception {
+        DetallePedidoResponseDTO detRes = new DetallePedidoResponseDTO(1L, 1L, "Producto Prueba", 2, 50.0, 100.0);
+        PedidoResponseDTO res = new PedidoResponseDTO(1L, LocalDateTime.now().toString(), "PENDIENTE", 100.0, List.of(detRes));
+
+        when(pedidoService.buscarPorId(anyLong())).thenReturn(res);
+
+        mockMvc.perform(get("/pedidos/1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L));
     }
 }

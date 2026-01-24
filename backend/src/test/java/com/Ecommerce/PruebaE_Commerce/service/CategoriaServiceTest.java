@@ -119,6 +119,18 @@ public class CategoriaServiceTest {
         assertEquals("Hogar", resultado.nombre());
     }
 
+    @Test
+    @DisplayName("Debe fallar actualización si el nuevo nombre ya existe")
+    void actualizarCategoriaFallaNombreDuplicado() {
+        CategoriaDTO nuevoDto = new CategoriaDTO("Hogar");
+
+        when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEjemplo));
+        when(categoriaRepository.existsByNombre("Hogar")).thenReturn(true);
+
+        assertThrows(BusinessLogicException.class, () -> categoriaService.actualizar(1L, nuevoDto));
+        verify(categoriaRepository, never()).save(any(Categoria.class));
+    }
+
     // --- PRUEBAS DE ELIMINACIÓN ---
 
     @Test

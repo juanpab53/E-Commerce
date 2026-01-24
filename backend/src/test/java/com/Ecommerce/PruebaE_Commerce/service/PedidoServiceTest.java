@@ -7,6 +7,7 @@ import com.Ecommerce.PruebaE_Commerce.dto.DetallePedidoDTO;
 import com.Ecommerce.PruebaE_Commerce.dto.PedidoDTO;
 import com.Ecommerce.PruebaE_Commerce.dto.PedidoResponseDTO;
 import com.Ecommerce.PruebaE_Commerce.exceptions.BusinessLogicException;
+import com.Ecommerce.PruebaE_Commerce.exceptions.ResourceNotFoundException;
 import com.Ecommerce.PruebaE_Commerce.model.*;
 import com.Ecommerce.PruebaE_Commerce.repository.PedidoRepository;
 import com.Ecommerce.PruebaE_Commerce.repository.ProductRepository;
@@ -143,5 +144,66 @@ public class PedidoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
         assertThrows(BusinessLogicException.class, () -> pedidoService.cancelarPedido(1L));
+    }
+
+    // --- PRUEBAS DE LISTADO ---
+
+    @Test
+    @DisplayName("Debe listar todos los pedidos")
+    void listarTodosExito() {
+        when(pedidoRepository.findAll()).thenReturn(List.of(pedidoEjemplo));
+
+        List<PedidoResponseDTO> resultado = pedidoService.listarTodos();
+
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+    }
+
+    @Test
+    @DisplayName("Debe listar pedidos por usuario")
+    void listarPedidosPorUsuarioExito() {
+        when(pedidoRepository.findByUsuarioId(1L)).thenReturn(List.of(pedidoEjemplo));
+
+        List<PedidoResponseDTO> resultado = pedidoService.listarPedidosPorUsuario(1L);
+
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+    }
+
+    // --- PRUEBAS DE CAMBIO DE ESTADO ---
+
+    @Test
+    @DisplayName("Debe cambiar estado exitosamente")
+    void cambiarEstadoExito() {
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
+        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoEjemplo);
+
+        PedidoResponseDTO resultado = pedidoService.cambiarEstado(1L, Estado.ENVIADO);
+
+        assertEquals(Estado.ENVIADO.name(), resultado.estado());
+        verify(pedidoRepository).save(pedidoEjemplo);
+    }
+
+    @Test
+    @DisplayName("Debe devolver stock si el nuevo estado es CANCELADO mediante cambiarEstado")
+    void cambiarEstadoACanceladoDevuelveStock() {
+        productoEjemplo.setCantidad(8); 
+        
+        when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
+        when(pedidoRepository.save(any(Pedido.class))).thenReturn(pedidoEjemplo);
+
+        PedidoResponseDTO resultado = pedidoService.cambiarEstado(1L, Estado.CANCELADO);
+
+        assertEquals(Estado.CANCELADO.name(), resultado.estado());
+        assertEquals(10, productoEjemplo.getCantidad()); 
+        verify(productRepository).save(productoEjemplo);
+    }
+
+    @Test
+    @DisplayName("Debe fallar cambio de estado si el pedido no existe")
+    void cambiarEstadoFallaNoEncontrado() {
+        when(pedidoRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> pedidoService.cambiarEstado(99L, Estado.ENVIADO));
     }
 }

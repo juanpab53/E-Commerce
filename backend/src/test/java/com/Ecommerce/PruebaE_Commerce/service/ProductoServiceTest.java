@@ -122,6 +122,17 @@ public class ProductoServiceTest {
     }
 
     @Test
+    @DisplayName("Debe buscar productos por nombre")
+    void buscarPorNombreExito() {
+        when(productRepository.findByNombreContainingIgnoreCase("Laptop")).thenReturn(List.of(productoEjemplo));
+
+        List<ProductoResponseDTO> resultado = productoService.buscarPorNombre("Laptop");
+
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
+    }
+
+    @Test
     @DisplayName("Debe listar productos por categoría")
     void listarPorCategoriaExito() {
         when(categoriaRepository.existsById(1L)).thenReturn(true);
@@ -130,6 +141,14 @@ public class ProductoServiceTest {
         List<ProductoResponseDTO> resultado = productoService.listarPorCategoria(1L);
 
         assertFalse(resultado.isEmpty());
+    }
+
+    @Test
+    @DisplayName("Debe fallar al listar por categoría si esta no existe")
+    void listarPorCategoriaFallaNoExiste() {
+        when(categoriaRepository.existsById(99L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> productoService.listarPorCategoria(99L));
     }
 
     // --- PRUEBAS DE ACTUALIZACIÓN DE STOCK ---
@@ -146,7 +165,40 @@ public class ProductoServiceTest {
         assertEquals(50, productoEjemplo.getCantidad());
     }
 
+    @Test
+    @DisplayName("Debe fallar actualización de stock si es negativo")
+    void actualizarStockFallaNegativo() {
+        assertThrows(BusinessLogicException.class, () -> productoService.actualizarStock(100L, -5));
+        verify(productRepository, never()).save(any(Producto.class));
+    }
+
+    @Test
+    @DisplayName("Debe fallar actualización de stock si el producto no existe")
+    void actualizarStockFallaNoEncontrado() {
+        when(productRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> productoService.actualizarStock(999L, 10));
+    }
+
     // --- PRUEBAS DE ELIMINACIÓN ---
+
+    @Test
+    @DisplayName("Debe eliminar producto exitosamente")
+    void eliminarProductoExito() {
+        when(productRepository.existsById(100L)).thenReturn(true);
+        when(detallePedidoRepository.existsByProductoId(100L)).thenReturn(false);
+
+        assertDoesNotThrow(() -> productoService.eliminar(100L));
+        verify(productRepository).deleteById(100L);
+    }
+
+    @Test
+    @DisplayName("Debe fallar eliminación si el producto no existe")
+    void eliminarProductoFallaNoEncontrado() {
+        when(productRepository.existsById(999L)).thenReturn(false);
+
+        assertThrows(ResourceNotFoundException.class, () -> productoService.eliminar(999L));
+    }
 
     @Test
     @DisplayName("Debe fallar eliminación si tiene historial de ventas (Integridad)")

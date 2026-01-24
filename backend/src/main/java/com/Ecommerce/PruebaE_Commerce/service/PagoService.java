@@ -25,7 +25,7 @@ public class PagoService {
     private PedidoRepository pedidoRepository;
 
     @Transactional 
-    public PagoResponseDTO processarPago(PagoDTO dtopago) {
+    public PagoResponseDTO procesarPago(PagoDTO dtopago) {
         Pedido pedido = pedidoRepository.findById(dtopago.pedidoId())
                 .orElseThrow(() -> new ResourceNotFoundException("No se puede procesar el pago: Pedido no encontrado con ID: " + dtopago.pedidoId()));
         

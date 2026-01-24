@@ -23,6 +23,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +68,7 @@ public class PagoServiceTest {
         when(pagoRepository.findByPedidoId(1L)).thenReturn(Optional.empty());
         when(pagoRepository.save(any(Pago.class))).thenReturn(pagoEjemplo);
         
-        PagoResponseDTO resultado = pagoService.processarPago(pagoDTO);
+        PagoResponseDTO resultado = pagoService.procesarPago(pagoDTO);
 
         assertNotNull(resultado);
         // Verificamos que el estado del pedido en memoria haya cambiado
@@ -82,7 +83,7 @@ public class PagoServiceTest {
     void procesarPagoFallaPedidoNoEncontrado() {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> pagoService.processarPago(pagoDTO));
+        assertThrows(ResourceNotFoundException.class, () -> pagoService.procesarPago(pagoDTO));
         verify(pagoRepository, never()).save(any(Pago.class));
     }
 
@@ -92,7 +93,7 @@ public class PagoServiceTest {
         pedidoEjemplo.setEstado(Estado.PAGADO);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.processarPago(pagoDTO));
+        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
         verify(pagoRepository, never()).save(any(Pago.class));
     }
 
@@ -102,7 +103,7 @@ public class PagoServiceTest {
         pedidoEjemplo.setEstado(Estado.CANCELADO);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.processarPago(pagoDTO));
+        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
     }
 
     @Test
@@ -111,7 +112,7 @@ public class PagoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
         when(pagoRepository.findByPedidoId(1L)).thenReturn(Optional.of(pagoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.processarPago(pagoDTO));
+        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
     }
 
     // --- PRUEBAS DE BÚSQUEDA ---
@@ -136,5 +137,16 @@ public class PagoServiceTest {
 
         assertNotNull(resultado);
         assertEquals(1L, resultado.pedidoId());
+    }
+
+    @Test
+    @DisplayName("Debe listar todos los pagos")
+    void listarTodosExito() {
+        when(pagoRepository.findAll()).thenReturn(List.of(pagoEjemplo));
+
+        List<PagoResponseDTO> resultado = pagoService.listarTodos();
+
+        assertFalse(resultado.isEmpty());
+        assertEquals(1, resultado.size());
     }
 }
