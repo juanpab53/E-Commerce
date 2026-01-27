@@ -3,12 +3,8 @@ name: Backend CI
 on:
   push:
     branches: [develop, main, feature/setup-cicd]
-    paths:
-      - "backend/**"
   pull_request:
     branches: [develop, main]
-    paths:
-      - "backend/**"
 
 jobs:
   test-and-coverage:
