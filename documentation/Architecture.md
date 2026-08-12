@@ -4,7 +4,7 @@
 
 Defines the target software architecture of the project, split by side: the backend follows a hybrid Domain-Driven Design (DDD) approach on a single Spring Boot module; the frontend architecture is stubbed here and will be defined with the frontend development.
 
-This document is part of the versioned technical documentation under `documentation/`. The execution roadmap lives in the development plan (`PLAN_REFACTOR_BACKEND.md`), which is kept local and not versioned.
+This document is part of the versioned technical documentation under `documentation/`.
 
 ## Backend: architecture and design
 

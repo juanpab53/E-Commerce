@@ -40,4 +40,3 @@ Rules:
 
 - **Code, branches, and commits**: English.
 - **Versioned technical documentation** (`documentation/*.md`): English.
-- **Development roadmap** (`PLAN_REFACTOR_BACKEND.md`): Spanish, kept local and not versioned.

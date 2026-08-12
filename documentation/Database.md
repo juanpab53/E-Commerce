@@ -30,11 +30,26 @@ Defines the persistence conventions of the project, split by side. The backend o
 
 ### Data types
 
-- Money is `BigDecimal` (not `double`). Migrated via Flyway `V2`; test assertions must be adjusted.
+- Money is `BigDecimal` (not `double`), in entities, aggregates, and DTOs. Migrated via Flyway `V2`; test assertions must be adjusted.
+- Dates are typed `TIMESTAMP` / `LocalDateTime` (not `String`) in `orders` and `payments` (`order_date`, `fecha_pago`).
+
+### Uniqueness constraints
+
+- `UNIQUE(order_id)` in `payments` backs up the duplicate-payment check (`findByOrderId`); a concurrent duplicate violates the constraint and surfaces as HTTP `409` via the global handler.
+- `UNIQUE(pedido_id, producto_id)` in `order_items`: one line per product; quantities of the same product are merged by `OrderFactory`.
+
+### Timestamps
+
+- `orders` and `payments` include `created_at` / `updated_at` (`LocalDateTime`), replicated in the JPA entities (`OrderJpaEntity`, `Payment`).
+
+### Indexes
+
+- Foreign keys are indexed: `orders.user_id`, `order_items.pedido_id`, `order_items.producto_id`, `payments.order_id`.
 
 ### Performance
 
 - The N+1 problem of orders is resolved with `EntityGraph` / fetch join.
+- Filtered queries (e.g., `findByUserId`) benefit from the FK indexes above.
 
 ## Frontend: data access (to define)
 

@@ -16,8 +16,6 @@ All code and internal system messages are written in English:
 - **Flyway migrations**: table names, columns, and SQL files.
 - **API routes and endpoints**.
 
-Spanish is reserved for project documentation that is not versioned (e.g., the roadmap `PLAN_REFACTOR_BACKEND.md`). Versioned technical documentation is also in English (see `Git-Workflow.md`). This removes Spanglish and keeps a single language in the codebase.
-
 ### Naming cases
 
 - **camelCase**: variables, methods, fields, and parameters (`createOrder`, `stockQuantity`).
