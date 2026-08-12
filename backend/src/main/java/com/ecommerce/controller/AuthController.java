@@ -5,21 +5,20 @@ import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.UserRepository;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/auth")
 @CrossOrigin(origins = "*")
 public class AuthController {
 
-    @Autowired
-    private UserRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
-    @Autowired
-private PasswordEncoder passwordEncoder; 
+    private final PasswordEncoder passwordEncoder;
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest) {

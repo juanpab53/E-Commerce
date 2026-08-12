@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.DetallePedidoDTO;
 import com.ecommerce.dto.DetallePedidoResponseDTO;
@@ -22,16 +22,14 @@ import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class PedidoService {
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
     @Transactional
     public PedidoResponseDTO crearPedido(PedidoDTO pedido) {

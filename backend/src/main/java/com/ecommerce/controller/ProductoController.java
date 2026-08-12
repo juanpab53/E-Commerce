@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +10,13 @@ import com.ecommerce.dto.ProductoResponseDTO;
 import com.ecommerce.service.ProductoService;
 import jakarta.validation.Valid;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/productos")
 @CrossOrigin(origins = "*")
 public class ProductoController {
 
-    @Autowired
-    private ProductoService productoService;
+    private final ProductoService productoService;
 
     @PostMapping
     public ResponseEntity<ProductoResponseDTO> crear(@Valid @RequestBody ProductoDTO productoDto) {

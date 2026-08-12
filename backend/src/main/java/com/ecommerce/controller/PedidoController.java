@@ -5,20 +5,20 @@ import com.ecommerce.dto.PedidoResponseDTO;
 import com.ecommerce.model.Estado;
 import com.ecommerce.service.PedidoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/pedidos")
 @CrossOrigin(origins = "*")
 public class PedidoController {
 
-    @Autowired
-    private PedidoService pedidoService;
+    private final PedidoService pedidoService;
 
     @PostMapping
     public ResponseEntity<PedidoResponseDTO> realizarPedido(@Valid @RequestBody PedidoDTO pedidoDto) {

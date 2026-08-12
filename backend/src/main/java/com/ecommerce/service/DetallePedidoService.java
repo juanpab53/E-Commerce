@@ -2,7 +2,7 @@ package com.ecommerce.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.DetallePedidoResponseDTO;
 import com.ecommerce.shared.domain.NotFoundException;
@@ -10,10 +10,10 @@ import com.ecommerce.model.DetallePedido;
 import com.ecommerce.repository.DetallePedidoRepository;
 import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class DetallePedidoService {
-    @Autowired
-    private DetallePedidoRepository detalleRepository;
+    private final DetallePedidoRepository detalleRepository;
 
     @Transactional
     public DetallePedidoResponseDTO buscarPorId(Long id) {

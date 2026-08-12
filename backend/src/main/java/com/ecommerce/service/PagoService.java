@@ -3,7 +3,7 @@ package com.ecommerce.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.PagoDTO;
 import com.ecommerce.dto.PagoResponseDTO;
@@ -16,13 +16,12 @@ import com.ecommerce.repository.PagoRepository;
 import com.ecommerce.repository.PedidoRepository;
 import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class PagoService {
-    @Autowired
-    private PagoRepository pagoRepository;
+    private final PagoRepository pagoRepository;
     
-    @Autowired
-    private PedidoRepository pedidoRepository;
+    private final PedidoRepository pedidoRepository;
 
     @Transactional 
     public PagoResponseDTO procesarPago(PagoDTO dtopago) {

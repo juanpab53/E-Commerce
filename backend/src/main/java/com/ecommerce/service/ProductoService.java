@@ -1,7 +1,7 @@
 package com.ecommerce.service;
 
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.ProductoDTO;
 import com.ecommerce.dto.ProductoResponseDTO;
@@ -14,16 +14,14 @@ import com.ecommerce.repository.DetallePedidoRepository;
 import com.ecommerce.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class ProductoService {
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    @Autowired
-    private DetallePedidoRepository detallePedidoRepository;
+    private final DetallePedidoRepository detallePedidoRepository;
 
     @Transactional
     public ProductoResponseDTO crear(ProductoDTO productoDto) {

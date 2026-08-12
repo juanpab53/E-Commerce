@@ -4,20 +4,20 @@ import com.ecommerce.dto.PagoDTO;
 import com.ecommerce.dto.PagoResponseDTO;
 import com.ecommerce.service.PagoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/pagos")
 @CrossOrigin(origins = "*")
 public class PagoController {
 
-    @Autowired
-    private PagoService pagoService;
+    private final PagoService pagoService;
 
     @PostMapping
     public ResponseEntity<PagoResponseDTO> procesar(@Valid @RequestBody PagoDTO pagoDto) {

@@ -8,19 +8,18 @@ import com.ecommerce.model.Categoria;
 import com.ecommerce.repository.CategoriaRepository;
 import com.ecommerce.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
 @Service
 public class CategoriaService {
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    private final CategoriaRepository categoriaRepository;
 
-    @Autowired
-    private ProductRepository productoRepository;
+    private final ProductRepository productoRepository;
 
     @Transactional
     public CategoriaResponseDTO crear(CategoriaDTO dto) {

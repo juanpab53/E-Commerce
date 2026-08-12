@@ -2,7 +2,7 @@ package com.ecommerce.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.UsuarioRegistroDTO;
@@ -15,14 +15,13 @@ import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.UserRepository;
 import jakarta.transaction.Transactional;
 
+@RequiredArgsConstructor
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UserRepository usuarioRepository;
+    private final UserRepository usuarioRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
     public boolean validarCredenciales(String email, String password) {
         return usuarioRepository.findByEmail(email)

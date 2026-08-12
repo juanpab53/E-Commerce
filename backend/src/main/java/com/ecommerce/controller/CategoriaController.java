@@ -4,20 +4,20 @@ import com.ecommerce.dto.CategoriaDTO;
 import com.ecommerce.dto.CategoriaResponseDTO;
 import com.ecommerce.service.CategoriaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/categorias")
 @CrossOrigin(origins = "*") 
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaService categoriaService;
+    private final CategoriaService categoriaService;
 
     @GetMapping
     public ResponseEntity<List<CategoriaResponseDTO>> listar() {
