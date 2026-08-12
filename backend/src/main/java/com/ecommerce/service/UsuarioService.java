@@ -7,9 +7,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.UsuarioRegistroDTO;
 import com.ecommerce.dto.UsuarioResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
-import com.ecommerce.model.Direccion;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.shared.domain.valueobject.Address;
 import com.ecommerce.model.Rol;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.UserRepository;
@@ -35,7 +35,7 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO registrarUsuario(UsuarioRegistroDTO usuarioDto) {
         if (usuarioRepository.existsByEmail(usuarioDto.email())) {
-            throw new BusinessLogicException("El email '" + usuarioDto.email() + "' ya está registrado.");
+            throw new BusinessRuleException("El email '" + usuarioDto.email() + "' ya está registrado.");
         }
 
         Usuario usuario = new Usuario();
@@ -46,11 +46,11 @@ public class UsuarioService {
         String hash = passwordEncoder.encode(usuarioDto.password());
         usuario.setPassword(hash);
 
-        Direccion dir = new Direccion();
-        dir.setCalle(usuarioDto.calle());
-        dir.setCiudad(usuarioDto.ciudad());
-        dir.setPais(usuarioDto.pais());
-        usuario.setDireccion(dir);
+        Address dir = new Address();
+        dir.setStreet(usuarioDto.calle());
+        dir.setCity(usuarioDto.ciudad());
+        dir.setCountry(usuarioDto.pais());
+        usuario.setAddress(dir);
         usuario.setRol(Rol.CLIENTE);
 
         Usuario usuarioGuardado = usuarioRepository.save(usuario);
@@ -67,25 +67,25 @@ public class UsuarioService {
     @Transactional
     public UsuarioResponseDTO obtenerUsuarioPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado con ID: " + id));
         return mapearAResponse(usuario);
     }
 
     @Transactional
     public UsuarioResponseDTO buscarPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró un usuario con el email: " + email));
+                .orElseThrow(() -> new NotFoundException("No se encontró un usuario con el email: " + email));
         return mapearAResponse(usuario);
     }
 
     @Transactional
     public UsuarioResponseDTO actualizar(Long id, UsuarioRegistroDTO dto) {
         Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new NotFoundException(
                         "No se puede actualizar: Usuario no encontrado con ID: " + id));
 
         if (!usuarioExistente.getEmail().equals(dto.email()) && usuarioRepository.existsByEmail(dto.email())) {
-            throw new BusinessLogicException(
+            throw new BusinessRuleException(
                     "No se puede actualizar: El email '" + dto.email() + "' ya está en uso por otro usuario.");
         }
 
@@ -97,11 +97,11 @@ public class UsuarioService {
             usuarioExistente.setPassword(passwordEncoder.encode(dto.password()));
         }
 
-        Direccion nuevaDir = new Direccion();
-        nuevaDir.setCalle(dto.calle());
-        nuevaDir.setCiudad(dto.ciudad());
-        nuevaDir.setPais(dto.pais());
-        usuarioExistente.setDireccion(nuevaDir);
+        Address nuevaDir = new Address();
+        nuevaDir.setStreet(dto.calle());
+        nuevaDir.setCity(dto.ciudad());
+        nuevaDir.setCountry(dto.pais());
+        usuarioExistente.setAddress(nuevaDir);
 
         return mapearAResponse(usuarioRepository.save(usuarioExistente));
     }
@@ -109,7 +109,7 @@ public class UsuarioService {
     @Transactional
     public void eliminarUsuario(Long id) {
         if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: Usuario no encontrado con ID: " + id);
+            throw new NotFoundException("No se puede eliminar: Usuario no encontrado con ID: " + id);
         }
         usuarioRepository.deleteById(id);
     }
@@ -119,7 +119,7 @@ public class UsuarioService {
                 u.getId(),
                 u.getNombre(),
                 u.getEmail(),
-                u.getDireccion().toString(),
+                u.getAddress().toString(),
                 u.getRol().toString());
     }
 }

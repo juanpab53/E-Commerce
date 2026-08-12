@@ -7,9 +7,9 @@ import static org.mockito.Mockito.*;
 import static org.junit.jupiter.api.Assertions.*;
 import com.ecommerce.dto.UsuarioRegistroDTO;
 import com.ecommerce.dto.UsuarioResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
-import com.ecommerce.model.Direccion;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.shared.domain.valueobject.Address;
 import com.ecommerce.model.Rol;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.UserRepository;
@@ -42,9 +42,9 @@ public class UsuarioServiceTest {
 
     @BeforeEach
     void setUp() {
-        Direccion direccionEjemplo = new Direccion();
-        direccionEjemplo.setCalle("Calle Falsa 123");
-        direccionEjemplo.setCiudad("Medellin");
+        Address addressEjemplo = new Address();
+        addressEjemplo.setStreet("Calle Falsa 123");
+        addressEjemplo.setCity("Medellin");
 
         usuarioEjemplo = new Usuario();
         usuarioEjemplo.setId(1L);
@@ -53,7 +53,7 @@ public class UsuarioServiceTest {
         usuarioEjemplo.setEmail("juan@example.com");
         usuarioEjemplo.setPassword("hash_encoded");
         usuarioEjemplo.setRol(Rol.CLIENTE); 
-        usuarioEjemplo.setDireccion(direccionEjemplo); 
+        usuarioEjemplo.setAddress(addressEjemplo); 
 
         registroDTO = new UsuarioRegistroDTO(
                 "Juan", "Aparicio", "juan@example.com", "password123",
@@ -81,7 +81,7 @@ public class UsuarioServiceTest {
     void registrarUsuarioFallaEmailDuplicado() {
         when(userRepository.existsByEmail(registroDTO.email())).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> usuarioService.registrarUsuario(registroDTO));
+        assertThrows(BusinessRuleException.class, () -> usuarioService.registrarUsuario(registroDTO));
         verify(userRepository, never()).save(any(Usuario.class));
     }
 
@@ -147,7 +147,7 @@ public class UsuarioServiceTest {
     void obtenerPorIdFalla() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> usuarioService.obtenerUsuarioPorId(99L));
+        assertThrows(NotFoundException.class, () -> usuarioService.obtenerUsuarioPorId(99L));
     }
 
     @Test
@@ -166,7 +166,7 @@ public class UsuarioServiceTest {
     void buscarPorEmailFalla() {
         when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> usuarioService.buscarPorEmail("noexiste@example.com"));
+        assertThrows(NotFoundException.class, () -> usuarioService.buscarPorEmail("noexiste@example.com"));
     }
 
     // --- PRUEBAS DE ACTUALIZACIÓN ---
@@ -193,7 +193,7 @@ public class UsuarioServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(usuarioEjemplo));
         when(userRepository.existsByEmail("otro@example.com")).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> usuarioService.actualizar(1L, dtoConNuevoEmail));
+        assertThrows(BusinessRuleException.class, () -> usuarioService.actualizar(1L, dtoConNuevoEmail));
         verify(userRepository, never()).save(any(Usuario.class));
     }
 
@@ -202,7 +202,7 @@ public class UsuarioServiceTest {
     void actualizarUsuarioFallaIdNoEncontrado() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> usuarioService.actualizar(99L, registroDTO));
+        assertThrows(NotFoundException.class, () -> usuarioService.actualizar(99L, registroDTO));
         verify(userRepository, never()).save(any(Usuario.class));
     }
 
@@ -222,7 +222,7 @@ public class UsuarioServiceTest {
     void eliminarUsuarioFalla() {
         when(userRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> usuarioService.eliminarUsuario(1L));
+        assertThrows(NotFoundException.class, () -> usuarioService.eliminarUsuario(1L));
         verify(userRepository, never()).deleteById(anyLong());
     }
 }

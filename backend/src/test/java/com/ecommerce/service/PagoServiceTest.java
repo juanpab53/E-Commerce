@@ -6,8 +6,8 @@ import static org.mockito.Mockito.*;
 
 import com.ecommerce.dto.PagoDTO;
 import com.ecommerce.dto.PagoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Estado;
 import com.ecommerce.model.MetodoPago;
 import com.ecommerce.model.Pago;
@@ -83,7 +83,7 @@ public class PagoServiceTest {
     void procesarPagoFallaPedidoNoEncontrado() {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> pagoService.procesarPago(pagoDTO));
+        assertThrows(NotFoundException.class, () -> pagoService.procesarPago(pagoDTO));
         verify(pagoRepository, never()).save(any(Pago.class));
     }
 
@@ -93,7 +93,7 @@ public class PagoServiceTest {
         pedidoEjemplo.setEstado(Estado.PAGADO);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
+        assertThrows(BusinessRuleException.class, () -> pagoService.procesarPago(pagoDTO));
         verify(pagoRepository, never()).save(any(Pago.class));
     }
 
@@ -103,7 +103,7 @@ public class PagoServiceTest {
         pedidoEjemplo.setEstado(Estado.CANCELADO);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
+        assertThrows(BusinessRuleException.class, () -> pagoService.procesarPago(pagoDTO));
     }
 
     @Test
@@ -112,7 +112,7 @@ public class PagoServiceTest {
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
         when(pagoRepository.findByPedidoId(1L)).thenReturn(Optional.of(pagoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pagoService.procesarPago(pagoDTO));
+        assertThrows(BusinessRuleException.class, () -> pagoService.procesarPago(pagoDTO));
     }
 
     // --- PRUEBAS DE BÚSQUEDA ---

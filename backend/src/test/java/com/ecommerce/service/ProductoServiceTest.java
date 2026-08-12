@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import com.ecommerce.dto.ProductoDTO;
 import com.ecommerce.dto.ProductoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Categoria;
 import com.ecommerce.model.Producto;
 import com.ecommerce.repository.CategoriaRepository;
@@ -86,7 +86,7 @@ public class ProductoServiceTest {
     void crearProductoFallaCategoria() {
         when(categoriaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> productoService.crear(productoDTO));
+        assertThrows(NotFoundException.class, () -> productoService.crear(productoDTO));
         verify(productRepository, never()).save(any(Producto.class));
     }
 
@@ -118,7 +118,7 @@ public class ProductoServiceTest {
     void buscarPorIdFalla() {
         when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> productoService.buscarPorId(999L));
+        assertThrows(NotFoundException.class, () -> productoService.buscarPorId(999L));
     }
 
     @Test
@@ -148,7 +148,7 @@ public class ProductoServiceTest {
     void listarPorCategoriaFallaNoExiste() {
         when(categoriaRepository.existsById(99L)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> productoService.listarPorCategoria(99L));
+        assertThrows(NotFoundException.class, () -> productoService.listarPorCategoria(99L));
     }
 
     // --- PRUEBAS DE ACTUALIZACIÓN DE STOCK ---
@@ -168,7 +168,7 @@ public class ProductoServiceTest {
     @Test
     @DisplayName("Debe fallar actualización de stock si es negativo")
     void actualizarStockFallaNegativo() {
-        assertThrows(BusinessLogicException.class, () -> productoService.actualizarStock(100L, -5));
+        assertThrows(BusinessRuleException.class, () -> productoService.actualizarStock(100L, -5));
         verify(productRepository, never()).save(any(Producto.class));
     }
 
@@ -177,7 +177,7 @@ public class ProductoServiceTest {
     void actualizarStockFallaNoEncontrado() {
         when(productRepository.findById(999L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> productoService.actualizarStock(999L, 10));
+        assertThrows(NotFoundException.class, () -> productoService.actualizarStock(999L, 10));
     }
 
     // --- PRUEBAS DE ELIMINACIÓN ---
@@ -197,7 +197,7 @@ public class ProductoServiceTest {
     void eliminarProductoFallaNoEncontrado() {
         when(productRepository.existsById(999L)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class, () -> productoService.eliminar(999L));
+        assertThrows(NotFoundException.class, () -> productoService.eliminar(999L));
     }
 
     @Test
@@ -206,7 +206,7 @@ public class ProductoServiceTest {
         when(productRepository.existsById(100L)).thenReturn(true);
         when(detallePedidoRepository.existsByProductoId(100L)).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> productoService.eliminar(100L));
+        assertThrows(BusinessRuleException.class, () -> productoService.eliminar(100L));
         verify(productRepository, never()).deleteById(anyLong());
     }
 }

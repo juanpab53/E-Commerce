@@ -5,8 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.ProductoDTO;
 import com.ecommerce.dto.ProductoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Categoria;
 import com.ecommerce.model.Producto;
 import com.ecommerce.repository.CategoriaRepository;
@@ -28,7 +28,7 @@ public class ProductoService {
     @Transactional
     public ProductoResponseDTO crear(ProductoDTO productoDto) {
         Categoria categoria = categoriaRepository.findById(productoDto.categoriaId())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el producto: Categoría no encontrada con ID: " + productoDto.categoriaId()));
+                .orElseThrow(() -> new NotFoundException("No se puede crear el producto: Categoría no encontrada con ID: " + productoDto.categoriaId()));
         
         Producto producto = new Producto();
         producto.setNombre(productoDto.nombre());
@@ -43,7 +43,7 @@ public class ProductoService {
     @Transactional
     private Producto encontrarProducto(Long id) {
         return productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado con ID: " + id));
     }
 
     @Transactional
@@ -55,7 +55,7 @@ public class ProductoService {
     @Transactional
     public ProductoResponseDTO buscarPorId(Long id) {
         Producto p = productRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Producto no encontrado con ID: " + id));
         return mapearAResponse(p);
     }
 
@@ -68,7 +68,7 @@ public class ProductoService {
     @Transactional
     public List<ProductoResponseDTO> listarPorCategoria(Long categoriaId) {
         if (!categoriaRepository.existsById(categoriaId)) {
-            throw new ResourceNotFoundException("No se pueden listar productos: Categoría no encontrada con ID: " + categoriaId);
+            throw new NotFoundException("No se pueden listar productos: Categoría no encontrada con ID: " + categoriaId);
         }
         return productRepository.findByCategoriaId(categoriaId).stream()
                 .map(this::mapearAResponse).toList();
@@ -77,7 +77,7 @@ public class ProductoService {
     @Transactional
     public ProductoResponseDTO actualizarStock(Long id, Integer nuevoStock) {
         if (nuevoStock < 0) {
-            throw new BusinessLogicException("Error de inventario: El stock no puede ser negativo (" + nuevoStock + ")");
+            throw new BusinessRuleException("Error de inventario: El stock no puede ser negativo (" + nuevoStock + ")");
         }
         Producto producto = encontrarProducto(id);
         producto.setCantidad(nuevoStock);
@@ -87,11 +87,11 @@ public class ProductoService {
     @Transactional
     public void eliminar(Long id) {
         if (!productRepository.existsById(id)) {
-            throw new ResourceNotFoundException("No se puede eliminar: Producto no encontrado con ID: " + id);
+            throw new NotFoundException("No se puede eliminar: Producto no encontrado con ID: " + id);
         }
 
         if (detallePedidoRepository.existsByProductoId(id)) {
-            throw new BusinessLogicException("Restricción de integridad: El producto con ID " + id + 
+            throw new BusinessRuleException("Restricción de integridad: El producto con ID " + id + 
                                            " tiene historial de ventas y no puede ser eliminado físicamente.");
         }
 

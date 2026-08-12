@@ -24,9 +24,27 @@ Defines how the API reports errors: the domain exception hierarchy, the global h
 |---|---|
 | `NotFoundException` | 404 |
 | `BusinessRuleException` | 400 |
+| `ValidationException` (value objects `Email`/`Money`) | 400 |
+| `MethodArgumentNotValidException`/`BindException` (`@Valid`) | 400 |
+| `HttpMessageNotReadableException` (malformed JSON) | 400 |
+| `MethodArgumentTypeMismatchException` (invalid param type) | 400 |
 | `OptimisticLockingFailureException` (`@Version`) | 409 |
 | Authentication/authorization failures (security layer) | 401 / 403 |
-| Unexpected errors | 500 (default) |
+| Unexpected errors | 500 (generic message, internal details logged) |
+
+### Redirections (3xx)
+
+- 3xx responses are intentionally **not generated**: the API is JSON-only with no
+  redirects, and authentication uses `httpBasic` (an unauthenticated request gets
+  `401`, never a `302` to a login page).
+
+### Server errors (5xx)
+
+- Every `500` passes through the global handler and uses the uniform `ErrorResponseDTO`;
+  the response body is a generic message and the stack trace is logged server-side
+  (no internal details are leaked).
+- `502`/`503`/`504` are emitted by the reverse proxy/gateway (e.g., nginx), not by the
+  application.
 
 ## Frontend: error handling (to define)
 

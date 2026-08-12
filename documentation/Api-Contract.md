@@ -23,11 +23,18 @@ Defines the HTTP API conventions that prepare the backend for synchronous consum
 | 200 OK | Successful read/update |
 | 201 Created | Resource created |
 | 204 No Content | Successful operation without body |
-| 400 Bad Request | Business rule violation |
+| 400 Bad Request | Business rule violation / input validation |
 | 401 Unauthorized | Missing/invalid credentials |
 | 403 Forbidden | Insufficient permissions |
 | 404 Not Found | Resource not found |
 | 409 Conflict | Concurrency conflict (`@Version`) |
+
+- **3xx (redirections)**: intentionally not generated. The API is JSON-only with no
+  redirects, and authentication uses `httpBasic` (unauthenticated requests get `401`,
+  never a `302` to a login page).
+- **5xx**: every unexpected error returns `500` with the uniform `ErrorResponseDTO`
+  (generic message, no internal details). `502`/`503`/`504` are emitted by the reverse
+  proxy/gateway (nginx), not by the application.
 
 ### Pagination
 

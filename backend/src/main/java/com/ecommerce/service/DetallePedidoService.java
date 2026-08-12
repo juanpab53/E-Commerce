@@ -5,7 +5,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.DetallePedidoResponseDTO;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.DetallePedido;
 import com.ecommerce.repository.DetallePedidoRepository;
 import jakarta.transaction.Transactional;
@@ -18,7 +18,7 @@ public class DetallePedidoService {
     @Transactional
     public DetallePedidoResponseDTO buscarPorId(Long id) {
         DetallePedido detalle = detalleRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Detalle de pedido no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Detalle de pedido no encontrado con ID: " + id));
         return mapearAResponse(detalle);
     }
 

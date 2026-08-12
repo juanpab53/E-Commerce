@@ -7,8 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ecommerce.dto.PagoDTO;
 import com.ecommerce.dto.PagoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Estado;
 import com.ecommerce.model.Pago;
 import com.ecommerce.model.Pedido;
@@ -27,18 +27,18 @@ public class PagoService {
     @Transactional 
     public PagoResponseDTO procesarPago(PagoDTO dtopago) {
         Pedido pedido = pedidoRepository.findById(dtopago.pedidoId())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede procesar el pago: Pedido no encontrado con ID: " + dtopago.pedidoId()));
+                .orElseThrow(() -> new NotFoundException("No se puede procesar el pago: Pedido no encontrado con ID: " + dtopago.pedidoId()));
         
         if (pedido.getEstado() == Estado.PAGADO) {
-            throw new BusinessLogicException("Operación inválida: El pedido con ID " + dtopago.pedidoId() + " ya ha sido pagado.");
+            throw new BusinessRuleException("Operación inválida: El pedido con ID " + dtopago.pedidoId() + " ya ha sido pagado.");
         }
 
         if(pedido.getEstado() == Estado.CANCELADO){
-            throw new BusinessLogicException("Operación inválida: No se puede pagar el pedido " + dtopago.pedidoId() + " porque se encuentra CANCELADO.");
+            throw new BusinessRuleException("Operación inválida: No se puede pagar el pedido " + dtopago.pedidoId() + " porque se encuentra CANCELADO.");
         }
 
         pagoRepository.findByPedidoId(dtopago.pedidoId()).ifPresent(p -> {
-            throw new BusinessLogicException("Conflicto: Ya existe un registro de pago asociado al pedido ID: " + dtopago.pedidoId());
+            throw new BusinessRuleException("Conflicto: Ya existe un registro de pago asociado al pedido ID: " + dtopago.pedidoId());
         });
 
         Pago pago = new Pago();
@@ -56,14 +56,14 @@ public class PagoService {
     @Transactional
     public PagoResponseDTO buscarPorId(Long id) {
         Pago pago = pagoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Registro de pago no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Registro de pago no encontrado con ID: " + id));
         return mapearAResponse(pago);
     }
 
     @Transactional
     public PagoResponseDTO buscarPorPedido(Long pedidoId) {
         Pago pago = pagoRepository.findByPedidoId(pedidoId)
-                .orElseThrow(() -> new ResourceNotFoundException("No se encontró ningún pago asociado al pedido ID: " + pedidoId));
+                .orElseThrow(() -> new NotFoundException("No se encontró ningún pago asociado al pedido ID: " + pedidoId));
         return mapearAResponse(pago);
     }
 

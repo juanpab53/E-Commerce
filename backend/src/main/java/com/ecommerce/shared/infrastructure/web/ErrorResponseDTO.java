@@ -1,4 +1,4 @@
-package com.ecommerce.dto;
+package com.ecommerce.shared.infrastructure.web;
 
 import java.time.LocalDateTime;
 

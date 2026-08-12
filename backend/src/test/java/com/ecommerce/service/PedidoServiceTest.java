@@ -6,8 +6,8 @@ import static org.mockito.Mockito.*;
 import com.ecommerce.dto.DetallePedidoDTO;
 import com.ecommerce.dto.PedidoDTO;
 import com.ecommerce.dto.PedidoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.*;
 import com.ecommerce.repository.PedidoRepository;
 import com.ecommerce.repository.ProductRepository;
@@ -104,7 +104,7 @@ public class PedidoServiceTest {
         DetallePedidoDTO detalleExcesivo = new DetallePedidoDTO(100L, 20);
         PedidoDTO pedidoExcesivo = new PedidoDTO(1L, List.of(detalleExcesivo));
 
-        assertThrows(BusinessLogicException.class, () -> pedidoService.crearPedido(pedidoExcesivo));
+        assertThrows(BusinessRuleException.class, () -> pedidoService.crearPedido(pedidoExcesivo));
         verify(pedidoRepository, never()).save(any(Pedido.class));
     }
 
@@ -143,7 +143,7 @@ public class PedidoServiceTest {
         pedidoEjemplo.setEstado(Estado.ENVIADO);
         when(pedidoRepository.findById(1L)).thenReturn(Optional.of(pedidoEjemplo));
 
-        assertThrows(BusinessLogicException.class, () -> pedidoService.cancelarPedido(1L));
+        assertThrows(BusinessRuleException.class, () -> pedidoService.cancelarPedido(1L));
     }
 
     // --- PRUEBAS DE LISTADO ---
@@ -204,6 +204,6 @@ public class PedidoServiceTest {
     void cambiarEstadoFallaNoEncontrado() {
         when(pedidoRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> pedidoService.cambiarEstado(99L, Estado.ENVIADO));
+        assertThrows(NotFoundException.class, () -> pedidoService.cambiarEstado(99L, Estado.ENVIADO));
     }
 }

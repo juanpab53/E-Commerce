@@ -2,8 +2,8 @@ package com.ecommerce.service;
 
 import com.ecommerce.dto.CategoriaDTO;
 import com.ecommerce.dto.CategoriaResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Categoria;
 import com.ecommerce.repository.CategoriaRepository;
 import com.ecommerce.repository.ProductRepository;
@@ -25,7 +25,7 @@ public class CategoriaService {
     @Transactional
     public CategoriaResponseDTO crear(CategoriaDTO dto) {
         if (categoriaRepository.existsByNombre(dto.nombre())) {
-            throw new BusinessLogicException("Conflicto de datos: La categoría con el nombre '" + dto.nombre() + "' ya existe.");
+            throw new BusinessRuleException("Conflicto de datos: La categoría con el nombre '" + dto.nombre() + "' ya existe.");
         }
         Categoria categoria = new Categoria();
         categoria.setNombre(dto.nombre());
@@ -44,17 +44,17 @@ public class CategoriaService {
     @Transactional
     public CategoriaResponseDTO buscarPorId(Long id) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Categoría no encontrada con ID: " + id));
         return mapearAResponse(categoria);
     }
 
     @Transactional
     public CategoriaResponseDTO actualizar(Long id, CategoriaDTO dto) {
         Categoria categoriaExistente = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede actualizar: Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("No se puede actualizar: Categoría no encontrada con ID: " + id));
         
         if (!categoriaExistente.getNombre().equals(dto.nombre()) && categoriaRepository.existsByNombre(dto.nombre())) {
-            throw new BusinessLogicException("No se puede actualizar: Ya existe otra categoría con el nombre '" + dto.nombre() + "'.");
+            throw new BusinessRuleException("No se puede actualizar: Ya existe otra categoría con el nombre '" + dto.nombre() + "'.");
         }
 
         categoriaExistente.setNombre(dto.nombre());
@@ -65,10 +65,10 @@ public class CategoriaService {
     @Transactional
     public void eliminar(Long id) {
         Categoria categoria = categoriaRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede eliminar: Categoría no encontrada con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("No se puede eliminar: Categoría no encontrada con ID: " + id));
 
         if (productoRepository.existsByCategoriaId(id)) {
-            throw new BusinessLogicException("Restricción de integridad: No se puede eliminar la categoría '" + 
+            throw new BusinessRuleException("Restricción de integridad: No se puede eliminar la categoría '" + 
                                            categoria.getNombre() + "' porque tiene productos asociados.");
         }
         

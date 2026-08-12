@@ -6,8 +6,8 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import com.ecommerce.dto.CategoriaDTO;
 import com.ecommerce.dto.CategoriaResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Categoria;
 import com.ecommerce.repository.CategoriaRepository;
 import com.ecommerce.repository.ProductRepository;
@@ -65,7 +65,7 @@ public class CategoriaServiceTest {
     void crearCategoriaFallaDuplicado() {
         when(categoriaRepository.existsByNombre(categoriaDTO.nombre())).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> categoriaService.crear(categoriaDTO));
+        assertThrows(BusinessRuleException.class, () -> categoriaService.crear(categoriaDTO));
         verify(categoriaRepository, never()).save(any(Categoria.class));
     }
 
@@ -97,7 +97,7 @@ public class CategoriaServiceTest {
     void buscarPorIdFalla() {
         when(categoriaRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> categoriaService.buscarPorId(99L));
+        assertThrows(NotFoundException.class, () -> categoriaService.buscarPorId(99L));
     }
 
     // --- PRUEBAS DE ACTUALIZACIÓN ---
@@ -127,7 +127,7 @@ public class CategoriaServiceTest {
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEjemplo));
         when(categoriaRepository.existsByNombre("Hogar")).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> categoriaService.actualizar(1L, nuevoDto));
+        assertThrows(BusinessRuleException.class, () -> categoriaService.actualizar(1L, nuevoDto));
         verify(categoriaRepository, never()).save(any(Categoria.class));
     }
 
@@ -149,7 +149,7 @@ public class CategoriaServiceTest {
         when(categoriaRepository.findById(1L)).thenReturn(Optional.of(categoriaEjemplo));
         when(productoRepository.existsByCategoriaId(1L)).thenReturn(true);
 
-        assertThrows(BusinessLogicException.class, () -> categoriaService.eliminar(1L));
+        assertThrows(BusinessRuleException.class, () -> categoriaService.eliminar(1L));
         verify(categoriaRepository, never()).delete(any(Categoria.class));
     }
 }

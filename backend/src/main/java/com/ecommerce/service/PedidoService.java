@@ -10,8 +10,8 @@ import com.ecommerce.dto.DetallePedidoDTO;
 import com.ecommerce.dto.DetallePedidoResponseDTO;
 import com.ecommerce.dto.PedidoDTO;
 import com.ecommerce.dto.PedidoResponseDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.DetallePedido;
 import com.ecommerce.model.Estado;
 import com.ecommerce.model.Pedido;
@@ -36,7 +36,7 @@ public class PedidoService {
     @Transactional
     public PedidoResponseDTO crearPedido(PedidoDTO pedido) {
         Usuario usuario = userRepository.findById(pedido.usuarioID())
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede crear el pedido: Usuario no encontrado con ID: " + pedido.usuarioID()));
+                .orElseThrow(() -> new NotFoundException("No se puede crear el pedido: Usuario no encontrado con ID: " + pedido.usuarioID()));
 
         Pedido pedidoNuevo = new Pedido();
         pedidoNuevo.setUsuario(usuario);
@@ -48,10 +48,10 @@ public class PedidoService {
 
         for (DetallePedidoDTO detalle : pedido.detalles()) {
             Producto productoDB = productRepository.findById(detalle.productoId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Error en el detalle: Producto no encontrado con ID: " + detalle.productoId()));
+                    .orElseThrow(() -> new NotFoundException("Error en el detalle: Producto no encontrado con ID: " + detalle.productoId()));
 
             if (productoDB.getCantidad() < detalle.cantidad()) {
-                throw new BusinessLogicException("Stock insuficiente para el producto '" + productoDB.getNombre() + 
+                throw new BusinessRuleException("Stock insuficiente para el producto '" + productoDB.getNombre() + 
                                                "'. Disponible: " + productoDB.getCantidad() + ", Solicitado: " + detalle.cantidad());
             }
 
@@ -92,14 +92,14 @@ public class PedidoService {
     @Transactional
     public PedidoResponseDTO buscarPorId(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Pedido no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Pedido no encontrado con ID: " + id));
         return mapearAResponse(pedido);
     }
 
     @Transactional
     public PedidoResponseDTO cambiarEstado(Long pedidoId, Estado nuevoEstado) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede cambiar el estado: Pedido no encontrado con ID: " + pedidoId));
+                .orElseThrow(() -> new NotFoundException("No se puede cambiar el estado: Pedido no encontrado con ID: " + pedidoId));
 
         if (nuevoEstado == Estado.CANCELADO && pedido.getEstado() != Estado.CANCELADO) {
             devolverStock(pedido);
@@ -112,14 +112,14 @@ public class PedidoService {
     @Transactional
     public PedidoResponseDTO cancelarPedido(Long id) {
         Pedido pedido = pedidoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No se puede cancelar: Pedido no encontrado con ID: " + id));
+                .orElseThrow(() -> new NotFoundException("No se puede cancelar: Pedido no encontrado con ID: " + id));
 
         if (pedido.getEstado() == Estado.ENVIADO || pedido.getEstado() == Estado.ENTREGADO) {
-            throw new BusinessLogicException("Acción no permitida: No se puede cancelar un pedido que ya ha sido " + pedido.getEstado());
+            throw new BusinessRuleException("Acción no permitida: No se puede cancelar un pedido que ya ha sido " + pedido.getEstado());
         }
 
         if (pedido.getEstado() == Estado.CANCELADO) {
-            throw new BusinessLogicException("Aviso: El pedido ya se encuentra en estado CANCELADO.");
+            throw new BusinessRuleException("Aviso: El pedido ya se encuentra en estado CANCELADO.");
         }
         
         devolverStock(pedido);

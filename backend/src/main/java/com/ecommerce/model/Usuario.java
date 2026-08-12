@@ -1,5 +1,6 @@
 package com.ecommerce.model;
 
+import com.ecommerce.shared.domain.valueobject.Address;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -28,5 +29,5 @@ public class Usuario {
     private Rol rol;
 
     @Embedded
-    private Direccion direccion;
+    private Address address;
 }

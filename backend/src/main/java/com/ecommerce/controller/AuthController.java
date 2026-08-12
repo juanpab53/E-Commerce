@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.exceptions.BusinessLogicException;
+import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.model.Usuario;
 import com.ecommerce.repository.UserRepository;
 import jakarta.validation.Valid;
@@ -25,10 +25,10 @@ private PasswordEncoder passwordEncoder;
     public ResponseEntity<String> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
 
         Usuario usuario = usuarioRepository.findByEmail(loginRequest.email())
-                .orElseThrow(() -> new BusinessLogicException("Credenciales inválidas: Usuario no encontrado"));
+                .orElseThrow(() -> new BusinessRuleException("Credenciales inválidas: Usuario no encontrado"));
 
         if (!passwordEncoder.matches(loginRequest.password(), usuario.getPassword())) {
-            throw new BusinessLogicException("Credenciales inválidas: Contraseña incorrecta");
+            throw new BusinessRuleException("Credenciales inválidas: Contraseña incorrecta");
         }
 
         return ResponseEntity.ok("Login exitoso. ¡Bienvenido " + usuario.getNombre() + "!");

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.ecommerce.dto.DetallePedidoResponseDTO;
-import com.ecommerce.exceptions.ResourceNotFoundException;
+import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.DetallePedido;
 import com.ecommerce.model.Producto;
 import com.ecommerce.repository.DetallePedidoRepository;
@@ -63,7 +63,7 @@ public class DetallePedidoServiceTest {
     void buscarPorIdFalla() {
         when(detalleRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> detalleService.buscarPorId(99L));
+        assertThrows(NotFoundException.class, () -> detalleService.buscarPorId(99L));
     }
 
     @Test

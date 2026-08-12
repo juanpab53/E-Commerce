@@ -105,11 +105,20 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Caso Error: JSON mal formado (BadRequest)")
-    void loginBadRequest() throws Exception {
+    @DisplayName("Caso Error: Cuerpo JSON vacío de campos obligatorios (400)")
+    void loginCamposObligatorios() throws Exception {
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
-                .andExpect(status().isInternalServerError());
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("Caso Error: JSON malformado (400)")
+    void loginJsonMalformado() throws Exception {
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{"))
+                .andExpect(status().isBadRequest());
     }
 }
