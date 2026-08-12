@@ -13,7 +13,6 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/productos")
-@CrossOrigin(origins = "*")
 public class ProductoController {
 
     private final ProductoService productoService;

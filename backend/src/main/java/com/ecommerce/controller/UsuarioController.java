@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 
 @RequiredArgsConstructor
 @RestController
-@CrossOrigin(origins = "*") 
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
