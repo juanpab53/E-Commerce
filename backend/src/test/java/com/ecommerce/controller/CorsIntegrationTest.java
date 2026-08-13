@@ -11,11 +11,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb_cors",
         "spring.datasource.driver-class-name=org.h2.Driver"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class CorsIntegrationTest {
 
     @LocalServerPort
@@ -26,9 +28,9 @@ class CorsIntegrationTest {
     }
 
     @Test
-    @DisplayName("Preflight valido a ruta publica: 200 + headers CORS + Max-Age")
+    @DisplayName("Valid preflight to a public route: 200 + CORS headers + Max-Age")
     void preflightValidPublicRoute() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/productos"))
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/products"))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://frontend.com")
                 .header("Access-Control-Request-Method", "GET")
@@ -46,9 +48,9 @@ class CorsIntegrationTest {
     }
 
     @Test
-    @DisplayName("Preflight a ruta protegida sin credenciales: 200 (CorsFilter corta antes de la autorizacion)")
+    @DisplayName("Preflight to a protected route without credentials: 200 (CorsFilter cuts before authorization)")
     void preflightProtectedRouteWithoutAuth() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/pedidos"))
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/orders"))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://frontend.com")
                 .header("Access-Control-Request-Method", "POST")
@@ -61,9 +63,9 @@ class CorsIntegrationTest {
     }
 
     @Test
-    @DisplayName("GET real con Origin: 200 + Access-Control-Allow-Origin")
+    @DisplayName("Real GET with Origin: 200 + Access-Control-Allow-Origin")
     void actualRequestWithOrigin() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/productos"))
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/products"))
                 .GET()
                 .header("Origin", "http://frontend.com")
                 .build();
@@ -75,9 +77,9 @@ class CorsIntegrationTest {
     }
 
     @Test
-    @DisplayName("OPTIONS sin headers de preflight a ruta protegida: 401 (no se trata como preflight)")
+    @DisplayName("OPTIONS without preflight headers on a protected route: 401 (not treated as preflight)")
     void plainOptionsIsNotPreflight() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/pedidos"))
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/orders"))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://frontend.com")
                 .build();

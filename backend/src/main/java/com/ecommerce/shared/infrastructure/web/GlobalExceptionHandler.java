@@ -22,97 +22,97 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    // Recurso no encontrado (404)
+    // Resource not found (404)
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFound(NotFoundException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.NOT_FOUND.value(),
-                "Recurso no encontrado",
+                "Resource not found",
                 ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
     }
 
-    // Regla de negocio violada (400)
+    // Business rule violated (400)
     @ExceptionHandler(BusinessRuleException.class)
     public ResponseEntity<ErrorResponseDTO> handleBusinessRule(BusinessRuleException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Error en la operación",
+                "Operation error",
                 ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Validación de entrada de los value objects (Email, Money) (400)
+    // Value object input validation (Email, Money) (400)
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorResponseDTO> handleValidation(ValidationException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Datos de entrada inválidos",
+                "Invalid input data",
                 ex.getMessage(),
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Validación de campos de DTO con @Valid (400)
+    // DTO field validation with @Valid (400)
     @ExceptionHandler({MethodArgumentNotValidException.class, BindException.class})
     public ResponseEntity<ErrorResponseDTO> handleValidationErrors(BindException ex, HttpServletRequest request) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .findFirst()
                 .map(fieldError -> fieldError.getDefaultMessage())
-                .orElse("Datos de entrada inválidos");
+                .orElse("Invalid input data");
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Datos de entrada inválidos",
+                "Invalid input data",
                 message,
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Cuerpo JSON malformado (400)
+    // Malformed JSON body (400)
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponseDTO> handleUnreadableMessage(HttpMessageNotReadableException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Datos de entrada inválidos",
-                "Formato de solicitud inválido",
+                "Invalid input data",
+                "Invalid request format",
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Tipo de parámetro de ruta/consulta inválido (400)
+    // Invalid path/query parameter type (400)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ErrorResponseDTO> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
-                "Datos de entrada inválidos",
-                "Parámetro '" + ex.getName() + "' con tipo inválido",
+                "Invalid input data",
+                "Parameter '" + ex.getName() + "' has an invalid type",
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
 
-    // Cualquier otro error inesperado (500): se loguea el detalle y se responde un mensaje genérico
+    // Any other unexpected error (500): the detail is logged and a generic message is returned
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex, HttpServletRequest request) {
-        log.error("Error no controlado en {} {}", request.getMethod(), request.getRequestURI(), ex);
+        log.error("Unhandled error in {} {}", request.getMethod(), request.getRequestURI(), ex);
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                "Error interno del servidor",
-                "Ocurrió un error inesperado. Intente nuevamente más tarde.",
+                "Internal server error",
+                "An unexpected error occurred. Please try again later.",
                 request.getRequestURI()
         );
         return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);

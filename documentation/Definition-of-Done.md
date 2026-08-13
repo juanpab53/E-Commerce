@@ -30,8 +30,8 @@ Checklist that gates every sprint of the refactor. It references the convention 
 - [ ] `@Version` on `Product` and `Order`; conflict → HTTP 409.
 - [ ] Enum values in the database in English (`PENDING`, `CREDIT_CARD`, ...) via migration.
 - [ ] Dates typed `TIMESTAMP`/`LocalDateTime` (not `String`) in `orders` and `payments`.
-- [ ] `UNIQUE(order_id)` in `payments`; `UNIQUE(pedido_id, producto_id)` in `order_items` (quantities merged in `OrderFactory`).
-- [ ] Indexes on FKs (`orders.user_id`, `order_items.pedido_id`, `order_items.producto_id`, `payments.order_id`).
+- [ ] `UNIQUE(order_id)` in `payments`; `UNIQUE(order_id, product_id)` in `order_items` (quantities merged in `OrderFactory`).
+- [ ] Indexes on FKs (`orders.user_id`, `order_items.order_id`, `order_items.product_id`, `payments.order_id`).
 - [ ] `created_at`/`updated_at` in `orders` and `payments`.
 - [ ] N+1 of orders resolved (EntityGraph / fetch join).
 

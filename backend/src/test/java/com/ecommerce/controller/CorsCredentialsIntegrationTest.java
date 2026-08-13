@@ -11,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.test.annotation.DirtiesContext;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb_cors_credentials",
@@ -18,6 +19,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
         "app.cors.allow-credentials=true",
         "app.cors.allowed-origins=*"
 })
+@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_CLASS)
 class CorsCredentialsIntegrationTest {
 
     @LocalServerPort
@@ -28,9 +30,9 @@ class CorsCredentialsIntegrationTest {
     }
 
     @Test
-    @DisplayName("Modo credenciales (futuro JWT en cookie): ACAO espeja el Origin + Allow-Credentials true")
+    @DisplayName("Credentials mode (future JWT in cookie): ACAO mirrors the Origin + Allow-Credentials true")
     void preflightWithCredentials() throws Exception {
-        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/productos"))
+        HttpRequest request = HttpRequest.newBuilder(URI.create("http://localhost:" + port + "/products"))
                 .method("OPTIONS", HttpRequest.BodyPublishers.noBody())
                 .header("Origin", "http://frontend.com")
                 .header("Access-Control-Request-Method", "GET")

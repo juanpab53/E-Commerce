@@ -1,7 +1,7 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.model.Usuario;
+import com.ecommerce.model.User;
 import com.ecommerce.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +39,7 @@ public class AuthControllerTest {
     private WebApplicationContext context;
 
     @MockitoBean
-    private UserRepository usuarioRepository;
+    private UserRepository userRepository;
 
     @MockitoBean
     private PasswordEncoder passwordEncoder;
@@ -54,31 +54,31 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Caso Exitoso: Login con credenciales válidas")
-    void loginExitoso() throws Exception {
-        Usuario mockUser = new Usuario();
+    @DisplayName("Success case: Login with valid credentials")
+    void loginSuccessful() throws Exception {
+        User mockUser = new User();
         mockUser.setEmail("test@test.com");
         mockUser.setPassword("hashed_pass");
-        mockUser.setNombre("Juan");
+        mockUser.setName("Juan");
 
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "123456");
 
-        when(usuarioRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches("123456", "hashed_pass")).thenReturn(true);
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Login exitoso. ¡Bienvenido Juan!")));
+                .andExpect(content().string(containsString("Login successful. Welcome Juan!")));
     }
 
     @Test
-    @DisplayName("Caso Error: Usuario no encontrado (400/Exception)")
-    void loginUsuarioNoEncontrado() throws Exception {
+    @DisplayName("Error case: User not found (400/Exception)")
+    void loginUserNotFound() throws Exception {
         LoginRequestDTO request = new LoginRequestDTO("noexiste@test.com", "123456");
 
-        when(usuarioRepository.findByEmail("noexiste@test.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmail("noexiste@test.com")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -87,15 +87,15 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Caso Error: Contraseña incorrecta")
-    void loginContrasenaIncorrecta() throws Exception {
-        Usuario mockUser = new Usuario();
+    @DisplayName("Error case: Incorrect password")
+    void loginWrongPassword() throws Exception {
+        User mockUser = new User();
         mockUser.setEmail("test@test.com");
         mockUser.setPassword("hashed_pass");
 
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "wrong_pass");
 
-        when(usuarioRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
+        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
         when(passwordEncoder.matches("wrong_pass", "hashed_pass")).thenReturn(false);
 
         mockMvc.perform(post("/auth/login")
@@ -105,8 +105,8 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Caso Error: Cuerpo JSON vacío de campos obligatorios (400)")
-    void loginCamposObligatorios() throws Exception {
+    @DisplayName("Error case: Empty JSON body for required fields (400)")
+    void loginRequiredFieldsMissing() throws Exception {
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{}"))
@@ -114,8 +114,8 @@ public class AuthControllerTest {
     }
 
     @Test
-    @DisplayName("Caso Error: JSON malformado (400)")
-    void loginJsonMalformado() throws Exception {
+    @DisplayName("Error case: Malformed JSON (400)")
+    void loginMalformedJson() throws Exception {
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("{"))
