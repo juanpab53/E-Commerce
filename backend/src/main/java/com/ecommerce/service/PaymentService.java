@@ -43,7 +43,7 @@ public class PaymentService {
         Payment payment = new Payment();
         payment.setOrder(order);
         payment.setAmount(order.getTotal());
-        payment.setPaymentDate(LocalDateTime.now().toString());
+        payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentMethod(paymentDto.paymentMethod());
         
         order.setStatus(OrderStatus.PAID);
@@ -78,7 +78,7 @@ public class PaymentService {
                 payment.getId(),
                 payment.getOrder().getId(),
                 payment.getAmount(),
-                payment.getPaymentDate(),
+                payment.getPaymentDate().toString(),
                 payment.getPaymentMethod().name(), 
                 payment.getOrder().getStatus().name()
         );

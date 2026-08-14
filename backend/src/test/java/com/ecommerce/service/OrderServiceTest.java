@@ -59,7 +59,7 @@ public class OrderServiceTest {
         exampleOrder = new Order();
         exampleOrder.setId(1L);
         exampleOrder.setUser(exampleUser);
-        exampleOrder.setOrderDate(LocalDateTime.now().toString());
+        exampleOrder.setOrderDate(LocalDateTime.now());
         exampleOrder.setStatus(OrderStatus.PENDING);
         exampleOrder.setTotal(2000.0);
 

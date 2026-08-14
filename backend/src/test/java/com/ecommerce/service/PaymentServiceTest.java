@@ -53,7 +53,7 @@ public class PaymentServiceTest {
         examplePayment.setId(10L);
         examplePayment.setOrder(exampleOrder);
         examplePayment.setAmount(1500.0);
-        examplePayment.setPaymentDate(LocalDateTime.now().toString());
+        examplePayment.setPaymentDate(LocalDateTime.now());
         examplePayment.setPaymentMethod(PaymentMethod.CREDIT_CARD);
 
         paymentDTO = new PaymentDTO(1L, PaymentMethod.CREDIT_CARD);

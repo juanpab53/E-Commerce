@@ -38,7 +38,7 @@ public class OrderService {
 
         Order newOrder = new Order();
         newOrder.setUser(user);
-        newOrder.setOrderDate(LocalDateTime.now().toString());
+        newOrder.setOrderDate(LocalDateTime.now());
         newOrder.setStatus(OrderStatus.PENDING);
 
         List<OrderItem> orderItems = new ArrayList<>();
@@ -147,7 +147,7 @@ public class OrderService {
 
         return new OrderResponseDTO(
                 order.getId(),
-                order.getOrderDate(),
+                order.getOrderDate().toString(),
                 order.getStatus().name(),
                 order.getTotal(),
                 itemsDTO);

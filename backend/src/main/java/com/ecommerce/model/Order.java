@@ -2,6 +2,8 @@ package com.ecommerce.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDateTime;
 import java.util.List;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -18,7 +20,7 @@ public class Order {
     private OrderStatus status;
 
     @Column(name = "order_date", nullable = false)
-    private String orderDate;
+    private LocalDateTime orderDate;
 
     private double total;
 
