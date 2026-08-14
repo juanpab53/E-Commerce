@@ -1,9 +1,9 @@
 package com.ecommerce.shared.domain.valueobject;
 
-import com.ecommerce.shared.domain.ValidationException;
-
 import java.math.BigDecimal;
 import java.util.Currency;
+
+import com.ecommerce.shared.domain.ValidationException;
 
 /**
  * Value object for monetary amounts.

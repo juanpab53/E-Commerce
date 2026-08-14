@@ -6,15 +6,17 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import java.time.LocalDate;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -25,7 +27,6 @@ import com.ecommerce.dto.PaymentResponseDTO;
 import com.ecommerce.model.OrderStatus;
 import com.ecommerce.model.PaymentMethod;
 import com.ecommerce.service.PaymentService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb_pago",
@@ -55,7 +56,8 @@ public class PaymentControllerTest {
     void processPayment() throws Exception {
         PaymentDTO paymentDto = new PaymentDTO(1L, PaymentMethod.CASH);
 
-        PaymentResponseDTO mockResponse = new PaymentResponseDTO(1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
+        PaymentResponseDTO mockResponse = new PaymentResponseDTO(
+                1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
 
         when(paymentService.processPayment(any(PaymentDTO.class))).thenReturn(mockResponse);
 
@@ -69,7 +71,8 @@ public class PaymentControllerTest {
     @Test
     @DisplayName("GET /payments/order/{orderId} - Find payment by order ID")
     void findByOrderId() throws Exception {
-        PaymentResponseDTO mockResponse = new PaymentResponseDTO(1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
+        PaymentResponseDTO mockResponse = new PaymentResponseDTO(
+                1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
 
         when(paymentService.findByOrderId(1L)).thenReturn(mockResponse);
 
@@ -81,7 +84,8 @@ public class PaymentControllerTest {
     @Test
     @DisplayName("GET /payments - List all payments")
     void listAll() throws Exception {
-        PaymentResponseDTO mockResponse = new PaymentResponseDTO(1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
+        PaymentResponseDTO mockResponse = new PaymentResponseDTO(
+                1L, 1L, 150.0, LocalDate.now().toString(), PaymentMethod.CASH.name(), OrderStatus.PAID.name());
 
         when(paymentService.listAll()).thenReturn(List.of(mockResponse));
 

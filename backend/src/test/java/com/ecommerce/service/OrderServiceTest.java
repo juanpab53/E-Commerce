@@ -1,17 +1,18 @@
 package com.ecommerce.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-import com.ecommerce.dto.OrderItemDTO;
-import com.ecommerce.dto.OrderDTO;
-import com.ecommerce.dto.OrderResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.model.*;
-import com.ecommerce.repository.OrderRepository;
-import com.ecommerce.repository.ProductRepository;
-import com.ecommerce.repository.UserRepository;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,9 +20,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+
+import com.ecommerce.dto.OrderDTO;
+import com.ecommerce.dto.OrderItemDTO;
+import com.ecommerce.dto.OrderResponseDTO;
+import com.ecommerce.model.Order;
+import com.ecommerce.model.OrderItem;
+import com.ecommerce.model.OrderStatus;
+import com.ecommerce.model.Product;
+import com.ecommerce.model.User;
+import com.ecommerce.repository.OrderRepository;
+import com.ecommerce.repository.ProductRepository;
+import com.ecommerce.repository.UserRepository;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class OrderServiceTest {
@@ -66,10 +78,10 @@ public class OrderServiceTest {
         OrderItem orderItem = new OrderItem();
         orderItem.setId(1L);
         orderItem.setProduct(exampleProduct);
-        orderItem.setQuantity(2); 
+        orderItem.setQuantity(2);
         orderItem.setUnitPrice(1000.0);
         orderItem.setOrder(exampleOrder);
-        
+
         exampleOrder.setOrderItems(List.of(orderItem));
 
         OrderItemDTO orderItemDTO = new OrderItemDTO(100L, 2);
@@ -90,7 +102,7 @@ public class OrderServiceTest {
         assertNotNull(result);
         assertEquals(OrderStatus.PENDING.name(), result.status());
         assertEquals(2000.0, result.total());
-        
+
         assertEquals(8, exampleProduct.getQuantity());
         verify(productRepository).save(exampleProduct);
     }
@@ -114,9 +126,9 @@ public class OrderServiceTest {
     @DisplayName("Should find an order by ID")
     void findByIdSuccess() {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(exampleOrder));
-        
+
         OrderResponseDTO result = orderService.findById(1L);
-        
+
         assertEquals(1L, result.id());
     }
 
@@ -126,7 +138,7 @@ public class OrderServiceTest {
     @DisplayName("Should cancel an order and refund stock")
     void cancelOrderSuccess() {
         exampleProduct.setQuantity(8);
-        
+
         when(orderRepository.findById(1L)).thenReturn(Optional.of(exampleOrder));
         when(orderRepository.save(any(Order.class))).thenAnswer(i -> i.getArgument(0));
 
@@ -187,15 +199,15 @@ public class OrderServiceTest {
     @Test
     @DisplayName("Should refund stock if the new status is CANCELLED via changeStatus")
     void changeStatusToCancelledRefundsStock() {
-        exampleProduct.setQuantity(8); 
-        
+        exampleProduct.setQuantity(8);
+
         when(orderRepository.findById(1L)).thenReturn(Optional.of(exampleOrder));
         when(orderRepository.save(any(Order.class))).thenReturn(exampleOrder);
 
         OrderResponseDTO result = orderService.changeStatus(1L, OrderStatus.CANCELLED);
 
         assertEquals(OrderStatus.CANCELLED.name(), result.status());
-        assertEquals(10, exampleProduct.getQuantity()); 
+        assertEquals(10, exampleProduct.getQuantity());
         verify(productRepository).save(exampleProduct);
     }
 

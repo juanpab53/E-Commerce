@@ -7,4 +7,4 @@ public record ProductResponseDTO(
     Double price,
     Integer quantity,
     String categoryName
-) {}
+) { }

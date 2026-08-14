@@ -1,0 +1,127 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Checkstyle configuration for the E-Commerce backend.
+
+  Inspired by Sun and Google checks, tailored to the project conventions
+  defined in documentation/Naming-Conventions.md:
+    - Single language: English (identifiers, messages, logs, comments).
+    - camelCase: variables, methods, fields, parameters.
+    - PascalCase: classes, interfaces, enums, records.
+    - UPPER_SNAKE_CASE: constants and enum values.
+    - Descriptive English names without ambiguous abbreviations.
+  Fail on violation in `mvn verify` and CI.
+-->
+
+<module name="Checker">
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- No tabs: consistent 4-space indentation -->
+    <module name="FileTabCharacter"/>
+
+    <!-- No trailing whitespace -->
+    <module name="RegexpSingleline">
+        <property name="format" value="\s+$"/>
+        <property name="message" value="Line has trailing spaces."/>
+    </module>
+
+    <!-- Lines up to 120 chars (package and import statements are exempt) -->
+    <module name="LineLength">
+        <property name="max" value="120"/>
+        <property name="ignorePattern" value="^(package|import) .*"/>
+    </module>
+
+    <module name="TreeWalker">
+        <!-- ========================================================= -->
+        <!-- Naming (documentation/Naming-Conventions.md)              -->
+        <!-- ========================================================= -->
+
+        <!-- No ambiguous abbreviations (allows up to 3 uppercase letters,
+             e.g. DTO, JPA, JWT, API) -->
+        <module name="AbbreviationAsWordInName"/>
+
+        <!-- camelCase: variables, methods, fields and parameters -->
+        <module name="CatchParameterName"/>
+        <module name="LambdaParameterName"/>
+        <module name="LocalVariableName"/>
+        <module name="MemberName"/>
+        <module name="MethodName"/>
+        <module name="ParameterName"/>
+        <module name="RecordComponentName"/>
+        <module name="StaticVariableName"/>
+
+        <!-- PascalCase: classes, interfaces, enums and records -->
+        <module name="ClassTypeParameterName"/>
+        <module name="InterfaceTypeParameterName"/>
+        <module name="MethodTypeParameterName"/>
+        <module name="TypeName"/>
+
+        <!-- UPPER_SNAKE_CASE: constants and enum values -->
+        <module name="ConstantName"/>
+
+        <!-- English lowercase packages -->
+        <module name="PackageName"/>
+
+        <!-- ========================================================= -->
+        <!-- Imports                                                   -->
+        <!-- ========================================================= -->
+
+        <!-- No wildcard imports -->
+        <module name="AvoidStarImport"/>
+
+        <!-- Static imports first, then java/javax, then third-party,
+             then com.ecommerce, each group alphabetically sorted -->
+        <module name="CustomImportOrder">
+            <property name="customImportOrderRules"
+                      value="STATIC###STANDARD_JAVA_PACKAGE###THIRD_PARTY_PACKAGE###SPECIAL_IMPORTS"/>
+            <property name="standardPackageRegExp" value="^(java|javax)\."/>
+            <property name="thirdPartyPackageRegExp" value=".*"/>
+            <property name="specialImportsRegExp" value="^com\.ecommerce\."/>
+            <property name="sortImportsInGroupAlphabetically" value="true"/>
+            <property name="separateLineBetweenGroups" value="true"/>
+        </module>
+
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+
+        <!-- ========================================================= -->
+        <!-- Style                                                     -->
+        <!-- ========================================================= -->
+
+        <!-- Whitespace around operators, keywords and braces -->
+        <module name="WhitespaceAround"/>
+        <module name="WhitespaceAfter"/>
+        <module name="NoWhitespaceBefore"/>
+        <module name="ParenPad"/>
+        <module name="MethodParamPad"/>
+        <module name="TypecastParenPad"/>
+        <module name="NoWhitespaceAfter"/>
+
+        <!-- Declaration order -->
+        <module name="ModifierOrder"/>
+        <module name="RedundantModifier"/>
+
+        <!-- One statement per line -->
+        <module name="OneStatementPerLine"/>
+        <module name="EmptyStatement"/>
+
+        <!-- Separators (EOL for operators, newline for method chains) -->
+        <module name="OperatorWrap">
+            <property name="option" value="eol"/>
+        </module>
+        <module name="SeparatorWrap">
+            <property name="option" value="nl"/>
+            <property name="tokens" value="DOT"/>
+        </module>
+
+        <!-- Braces -->
+        <module name="NeedBraces"/>
+
+        <!-- Trailing comma after last element of multi-line arrays/enums -->
+        <module name="ArrayTrailingComma"/>
+    </module>
+</module>

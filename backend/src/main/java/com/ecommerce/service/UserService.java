@@ -2,18 +2,20 @@ package com.ecommerce.service;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.shared.domain.valueobject.Address;
 import com.ecommerce.model.Role;
 import com.ecommerce.model.User;
 import com.ecommerce.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.shared.domain.valueobject.Address;
 
 @RequiredArgsConstructor
 @Service

@@ -1,11 +1,18 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.OrderItemDTO;
-import com.ecommerce.dto.OrderItemResponseDTO;
-import com.ecommerce.dto.OrderDTO;
-import com.ecommerce.dto.OrderResponseDTO;
-import com.ecommerce.model.OrderStatus;
-import com.ecommerce.service.OrderService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -18,13 +25,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.ecommerce.dto.OrderDTO;
+import com.ecommerce.dto.OrderItemDTO;
+import com.ecommerce.dto.OrderItemResponseDTO;
+import com.ecommerce.dto.OrderResponseDTO;
+import com.ecommerce.model.OrderStatus;
+import com.ecommerce.service.OrderService;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb_pedido",
@@ -91,7 +97,8 @@ public class OrderControllerTest {
     @DisplayName("PATCH /orders/{id}/status - Update status")
     void updateStatus() throws Exception {
         OrderItemResponseDTO itemRes = new OrderItemResponseDTO(1L, 1L, "Producto Prueba", 2, 50.0, 100.0);
-        OrderResponseDTO res = new OrderResponseDTO(1L, LocalDateTime.now().toString(), "SHIPPED", 500.0, List.of(itemRes));
+        OrderResponseDTO res = new OrderResponseDTO(
+                1L, LocalDateTime.now().toString(), "SHIPPED", 500.0, List.of(itemRes));
 
         when(orderService.changeStatus(anyLong(), any(OrderStatus.class))).thenReturn(res);
 
@@ -112,7 +119,8 @@ public class OrderControllerTest {
     @DisplayName("GET /orders/{id} - Find by ID")
     void findById() throws Exception {
         OrderItemResponseDTO itemRes = new OrderItemResponseDTO(1L, 1L, "Producto Prueba", 2, 50.0, 100.0);
-        OrderResponseDTO res = new OrderResponseDTO(1L, LocalDateTime.now().toString(), "PENDING", 100.0, List.of(itemRes));
+        OrderResponseDTO res = new OrderResponseDTO(
+                1L, LocalDateTime.now().toString(), "PENDING", 100.0, List.of(itemRes));
 
         when(orderService.findById(anyLong())).thenReturn(res);
 

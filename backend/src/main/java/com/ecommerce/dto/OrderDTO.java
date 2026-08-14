@@ -10,4 +10,4 @@ public record OrderDTO(
 
     @NotNull(message = "The product list cannot be null")
     List<OrderItemDTO> orderItems
-) {}
+) { }

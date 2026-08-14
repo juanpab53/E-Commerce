@@ -21,4 +21,4 @@ public record ProductDTO(
 
     @NotNull(message = "Category ID is required")
     Long categoryId
-) {}
+) { }

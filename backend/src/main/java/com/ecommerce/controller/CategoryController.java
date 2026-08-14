@@ -1,15 +1,23 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.CategoryDTO;
-import com.ecommerce.dto.CategoryResponseDTO;
-import com.ecommerce.service.CategoryService;
+import java.util.List;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.ecommerce.dto.CategoryDTO;
+import com.ecommerce.dto.CategoryResponseDTO;
+import com.ecommerce.service.CategoryService;
 
 @RequiredArgsConstructor
 @RestController
@@ -36,7 +44,7 @@ public class CategoryController {
 
     @PutMapping("/{id}")
     public ResponseEntity<CategoryResponseDTO> update(
-            @PathVariable Long id, 
+            @PathVariable Long id,
             @Valid @RequestBody CategoryDTO categoryDto) {
         return ResponseEntity.ok(categoryService.update(id, categoryDto));
     }

@@ -6,6 +6,6 @@ public record PaymentResponseDTO(
     Long orderId,
     Double amount,
     String paymentDate,
-    String paymentMethod, 
+    String paymentMethod,
     String orderStatus
-) {}
+) { }

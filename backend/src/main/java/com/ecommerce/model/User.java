@@ -1,8 +1,17 @@
 package com.ecommerce.model;
 
-import com.ecommerce.shared.domain.valueobject.Address;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embedded;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Data;
+
+import com.ecommerce.shared.domain.valueobject.Address;
 
 @Data
 @Entity

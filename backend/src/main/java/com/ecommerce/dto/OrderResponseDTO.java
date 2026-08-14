@@ -9,4 +9,4 @@ public record OrderResponseDTO(
     Double total,
     List<OrderItemResponseDTO> orderItems
 
-) {}
+) { }

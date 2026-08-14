@@ -1,8 +1,7 @@
 package com.ecommerce.shared.infrastructure.web;
 
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.shared.domain.ValidationException;
+import java.time.LocalDateTime;
+
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,12 +14,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
-import java.time.LocalDateTime;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.shared.domain.ValidationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     // Resource not found (404)
     @ExceptionHandler(NotFoundException.class)
@@ -80,7 +81,8 @@ public class GlobalExceptionHandler {
 
     // Malformed JSON body (400)
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponseDTO> handleUnreadableMessage(HttpMessageNotReadableException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDTO> handleUnreadableMessage(
+            HttpMessageNotReadableException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -93,7 +95,8 @@ public class GlobalExceptionHandler {
 
     // Invalid path/query parameter type (400)
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponseDTO> handleTypeMismatch(MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
+    public ResponseEntity<ErrorResponseDTO> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex, HttpServletRequest request) {
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.BAD_REQUEST.value(),
@@ -107,7 +110,7 @@ public class GlobalExceptionHandler {
     // Any other unexpected error (500): the detail is logged and a generic message is returned
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGeneralException(Exception ex, HttpServletRequest request) {
-        log.error("Unhandled error in {} {}", request.getMethod(), request.getRequestURI(), ex);
+        LOG.error("Unhandled error in {} {}", request.getMethod(), request.getRequestURI(), ex);
         ErrorResponseDTO error = new ErrorResponseDTO(
                 LocalDateTime.now(),
                 HttpStatus.INTERNAL_SERVER_ERROR.value(),

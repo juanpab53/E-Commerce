@@ -4,23 +4,25 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.dto.OrderItemDTO;
 import com.ecommerce.dto.OrderItemResponseDTO;
-import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.dto.OrderResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.model.Order;
 import com.ecommerce.model.OrderItem;
 import com.ecommerce.model.OrderStatus;
-import com.ecommerce.model.Order;
 import com.ecommerce.model.Product;
 import com.ecommerce.model.User;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.ProductRepository;
 import com.ecommerce.repository.UserRepository;
-import jakarta.transaction.Transactional;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -34,7 +36,8 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO createOrder(OrderDTO order) {
         User user = userRepository.findById(order.userId())
-                .orElseThrow(() -> new NotFoundException("Cannot create the order: User not found with ID: " + order.userId()));
+                .orElseThrow(() -> new NotFoundException(
+                        "Cannot create the order: User not found with ID: " + order.userId()));
 
         Order newOrder = new Order();
         newOrder.setUser(user);
@@ -46,11 +49,13 @@ public class OrderService {
 
         for (OrderItemDTO item : order.orderItems()) {
             Product productFromDB = productRepository.findById(item.productId())
-                    .orElseThrow(() -> new NotFoundException("Detail error: Product not found with ID: " + item.productId()));
+                    .orElseThrow(() -> new NotFoundException(
+                            "Detail error: Product not found with ID: " + item.productId()));
 
             if (productFromDB.getQuantity() < item.quantity()) {
-                throw new BusinessRuleException("Insufficient stock for the product '" + productFromDB.getName() + 
-                                               "'. Available: " + productFromDB.getQuantity() + ", Requested: " + item.quantity());
+                throw new BusinessRuleException("Insufficient stock for the product '" + productFromDB.getName() +
+                        "'. Available: " + productFromDB.getQuantity() +
+                        ", Requested: " + item.quantity());
             }
 
             productFromDB.setQuantity(productFromDB.getQuantity() - item.quantity());
@@ -97,12 +102,13 @@ public class OrderService {
     @Transactional
     public OrderResponseDTO changeStatus(Long orderId, OrderStatus newStatus) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new NotFoundException("Cannot change the status: Order not found with ID: " + orderId));
+                .orElseThrow(() -> new NotFoundException(
+                        "Cannot change the status: Order not found with ID: " + orderId));
 
         if (newStatus == OrderStatus.CANCELLED && order.getStatus() != OrderStatus.CANCELLED) {
             refundStock(order);
         }
-        
+
         order.setStatus(newStatus);
         return toResponse(orderRepository.save(order));
     }
@@ -113,16 +119,17 @@ public class OrderService {
                 .orElseThrow(() -> new NotFoundException("Cannot cancel: Order not found with ID: " + id));
 
         if (order.getStatus() == OrderStatus.SHIPPED || order.getStatus() == OrderStatus.DELIVERED) {
-            throw new BusinessRuleException("Action not allowed: An order that has already been " + order.getStatus() + " cannot be cancelled.");
+            throw new BusinessRuleException("Action not allowed: An order that has already been " + order.getStatus() +
+                    " cannot be cancelled.");
         }
 
         if (order.getStatus() == OrderStatus.CANCELLED) {
             throw new BusinessRuleException("Notice: The order is already in CANCELLED status.");
         }
-        
+
         refundStock(order);
         order.setStatus(OrderStatus.CANCELLED);
-        
+
         return toResponse(orderRepository.save(order));
     }
 

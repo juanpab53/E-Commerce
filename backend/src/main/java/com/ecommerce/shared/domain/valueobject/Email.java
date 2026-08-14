@@ -1,8 +1,8 @@
 package com.ecommerce.shared.domain.valueobject;
 
-import com.ecommerce.shared.domain.ValidationException;
-
 import java.util.regex.Pattern;
+
+import com.ecommerce.shared.domain.ValidationException;
 
 public record Email(String value) {
 

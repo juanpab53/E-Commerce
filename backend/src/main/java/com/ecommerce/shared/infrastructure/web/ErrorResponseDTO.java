@@ -8,4 +8,4 @@ public record ErrorResponseDTO(
     String error,
     String message,
     String path
-) {}
+) { }

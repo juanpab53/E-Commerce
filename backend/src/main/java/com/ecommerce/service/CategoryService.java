@@ -1,17 +1,19 @@
 package com.ecommerce.service;
 
-import com.ecommerce.dto.CategoryDTO;
-import com.ecommerce.dto.CategoryResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.model.Category;
-import com.ecommerce.repository.CategoryRepository;
-import com.ecommerce.repository.ProductRepository;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.stream.Collectors;
+
+import com.ecommerce.dto.CategoryDTO;
+import com.ecommerce.dto.CategoryResponseDTO;
+import com.ecommerce.model.Category;
+import com.ecommerce.repository.CategoryRepository;
+import com.ecommerce.repository.ProductRepository;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -24,11 +26,12 @@ public class CategoryService {
     @Transactional
     public CategoryResponseDTO create(CategoryDTO dto) {
         if (categoryRepository.existsByName(dto.name())) {
-            throw new BusinessRuleException("Data conflict: A category with the name '" + dto.name() + "' already exists.");
+            throw new BusinessRuleException(
+                    "Data conflict: A category with the name '" + dto.name() + "' already exists.");
         }
         Category category = new Category();
         category.setName(dto.name());
-        
+
         Category saved = categoryRepository.save(category);
         return toResponse(saved);
     }
@@ -51,9 +54,10 @@ public class CategoryService {
     public CategoryResponseDTO update(Long id, CategoryDTO dto) {
         Category existingCategory = categoryRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("Cannot update: Category not found with ID: " + id));
-        
+
         if (!existingCategory.getName().equals(dto.name()) && categoryRepository.existsByName(dto.name())) {
-            throw new BusinessRuleException("Cannot update: Another category already exists with the name '" + dto.name() + "'.");
+            throw new BusinessRuleException(
+                    "Cannot update: Another category already exists with the name '" + dto.name() + "'.");
         }
 
         existingCategory.setName(dto.name());
@@ -67,10 +71,10 @@ public class CategoryService {
                 .orElseThrow(() -> new NotFoundException("Cannot delete: Category not found with ID: " + id));
 
         if (productRepository.existsByCategoryId(id)) {
-            throw new BusinessRuleException("Integrity constraint: The category '" + 
-                                           category.getName() + "' cannot be deleted because it has associated products.");
+            throw new BusinessRuleException("Integrity constraint: The category '" + category.getName() +
+                    "' cannot be deleted because it has associated products.");
         }
-        
+
         categoryRepository.delete(category);
     }
 

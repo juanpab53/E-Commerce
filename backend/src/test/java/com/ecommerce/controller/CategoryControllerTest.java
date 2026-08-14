@@ -1,8 +1,17 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.CategoryDTO;
-import com.ecommerce.dto.CategoryResponseDTO;
-import com.ecommerce.service.CategoryService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,12 +24,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.ecommerce.dto.CategoryDTO;
+import com.ecommerce.dto.CategoryResponseDTO;
+import com.ecommerce.service.CategoryService;
 
 @SpringBootTest(properties = {
     "spring.datasource.url=jdbc:h2:mem:testdb_cat",
@@ -77,7 +83,7 @@ public class CategoryControllerTest {
         mockMvc.perform(post("/categories")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(registration)))
-                .andExpect(status().isCreated()) 
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Hogar"));
     }
@@ -101,6 +107,6 @@ public class CategoryControllerTest {
     @DisplayName("DELETE /categories/{id} - Delete category")
     void deleteCategory() throws Exception {
         mockMvc.perform(delete("/categories/1"))
-                .andExpect(status().isNoContent()); 
+                .andExpect(status().isNoContent());
     }
 }

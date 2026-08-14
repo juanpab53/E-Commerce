@@ -8,4 +8,4 @@ public record OrderItemResponseDTO(
     Double unitPrice,
     Double subtotal
 
-) {}
+) { }

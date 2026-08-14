@@ -3,41 +3,48 @@ package com.ecommerce.service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import com.ecommerce.dto.PaymentDTO;
 import com.ecommerce.dto.PaymentResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.model.Order;
 import com.ecommerce.model.OrderStatus;
 import com.ecommerce.model.Payment;
-import com.ecommerce.model.Order;
-import com.ecommerce.repository.PaymentRepository;
 import com.ecommerce.repository.OrderRepository;
-import jakarta.transaction.Transactional;
+import com.ecommerce.repository.PaymentRepository;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
 public class PaymentService {
     private final PaymentRepository paymentRepository;
-    
+
     private final OrderRepository orderRepository;
 
-    @Transactional 
+    @Transactional
     public PaymentResponseDTO processPayment(PaymentDTO paymentDto) {
         Order order = orderRepository.findById(paymentDto.orderId())
-                .orElseThrow(() -> new NotFoundException("Cannot process the payment: Order not found with ID: " + paymentDto.orderId()));
-        
+                .orElseThrow(() -> new NotFoundException(
+                        "Cannot process the payment: Order not found with ID: " + paymentDto.orderId()));
+
         if (order.getStatus() == OrderStatus.PAID) {
-            throw new BusinessRuleException("Invalid operation: The order with ID " + paymentDto.orderId() + " has already been paid.");
+            throw new BusinessRuleException(
+                    "Invalid operation: The order with ID " + paymentDto.orderId() + " has already been paid.");
         }
 
-        if(order.getStatus() == OrderStatus.CANCELLED){
-            throw new BusinessRuleException("Invalid operation: The order " + paymentDto.orderId() + " cannot be paid because it is CANCELLED.");
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BusinessRuleException(
+                    "Invalid operation: The order " + paymentDto.orderId() +
+                            " cannot be paid because it is CANCELLED.");
         }
 
         paymentRepository.findByOrderId(paymentDto.orderId()).ifPresent(p -> {
-            throw new BusinessRuleException("Conflict: A payment record already exists for the order ID: " + paymentDto.orderId());
+            throw new BusinessRuleException(
+                    "Conflict: A payment record already exists for the order ID: " + paymentDto.orderId());
         });
 
         Payment payment = new Payment();
@@ -45,7 +52,7 @@ public class PaymentService {
         payment.setAmount(order.getTotal());
         payment.setPaymentDate(LocalDateTime.now());
         payment.setPaymentMethod(paymentDto.paymentMethod());
-        
+
         order.setStatus(OrderStatus.PAID);
         orderRepository.save(order);
 
@@ -79,7 +86,7 @@ public class PaymentService {
                 payment.getOrder().getId(),
                 payment.getAmount(),
                 payment.getPaymentDate().toString(),
-                payment.getPaymentMethod().name(), 
+                payment.getPaymentMethod().name(),
                 payment.getOrder().getStatus().name()
         );
     }

@@ -1,8 +1,14 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.model.User;
-import com.ecommerce.repository.UserRepository;
+import static org.hamcrest.Matchers.containsString;
+import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -16,14 +22,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content; 
-import static org.hamcrest.Matchers.containsString;
-
-import java.util.Optional;
+import com.ecommerce.dto.LoginRequestDTO;
+import com.ecommerce.model.User;
+import com.ecommerce.repository.UserRepository;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",

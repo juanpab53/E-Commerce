@@ -1,18 +1,20 @@
 package com.ecommerce.service;
 
 import java.util.List;
+
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import com.ecommerce.dto.ProductDTO;
 import com.ecommerce.dto.ProductResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.model.Category;
 import com.ecommerce.model.Product;
 import com.ecommerce.repository.CategoryRepository;
 import com.ecommerce.repository.OrderItemRepository;
 import com.ecommerce.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @RequiredArgsConstructor
 @Service
@@ -26,8 +28,9 @@ public class ProductService {
     @Transactional
     public ProductResponseDTO create(ProductDTO productDto) {
         Category category = categoryRepository.findById(productDto.categoryId())
-                .orElseThrow(() -> new NotFoundException("Cannot create product: Category not found with ID: " + productDto.categoryId()));
-        
+                .orElseThrow(() -> new NotFoundException(
+                        "Cannot create product: Category not found with ID: " + productDto.categoryId()));
+
         Product product = new Product();
         product.setName(productDto.name());
         product.setDescription(productDto.description());
@@ -89,7 +92,7 @@ public class ProductService {
         }
 
         if (orderItemRepository.existsByProductId(id)) {
-            throw new BusinessRuleException("Integrity constraint: The product with ID " + id + 
+            throw new BusinessRuleException("Integrity constraint: The product with ID " + id +
                                            " has sales history and cannot be physically deleted.");
         }
 

@@ -1,19 +1,18 @@
 package com.ecommerce.service;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.ecommerce.dto.PaymentDTO;
-import com.ecommerce.dto.PaymentResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.model.OrderStatus;
-import com.ecommerce.model.PaymentMethod;
-import com.ecommerce.model.Payment;
-import com.ecommerce.model.Order;
-import com.ecommerce.repository.PaymentRepository;
-import com.ecommerce.repository.OrderRepository;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,9 +21,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import com.ecommerce.dto.PaymentDTO;
+import com.ecommerce.dto.PaymentResponseDTO;
+import com.ecommerce.model.Order;
+import com.ecommerce.model.OrderStatus;
+import com.ecommerce.model.Payment;
+import com.ecommerce.model.PaymentMethod;
+import com.ecommerce.repository.OrderRepository;
+import com.ecommerce.repository.PaymentRepository;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class PaymentServiceTest {
@@ -67,7 +73,7 @@ public class PaymentServiceTest {
         when(orderRepository.findById(1L)).thenReturn(Optional.of(exampleOrder));
         when(paymentRepository.findByOrderId(1L)).thenReturn(Optional.empty());
         when(paymentRepository.save(any(Payment.class))).thenReturn(examplePayment);
-        
+
         PaymentResponseDTO result = paymentService.processPayment(paymentDTO);
 
         assertNotNull(result);

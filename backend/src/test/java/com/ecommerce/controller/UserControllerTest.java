@@ -1,8 +1,18 @@
 package com.ecommerce.controller;
 
-import com.ecommerce.dto.UserRegistrationDTO;
-import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.service.UserService;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import java.util.List;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -15,13 +25,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.util.List;
-
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.mockito.ArgumentMatchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.ecommerce.dto.UserRegistrationDTO;
+import com.ecommerce.dto.UserResponseDTO;
+import com.ecommerce.service.UserService;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",
@@ -49,7 +55,8 @@ public class UserControllerTest {
     @Test
     @DisplayName("POST /users/register - Should register a user")
     void registerUser() throws Exception {
-        UserRegistrationDTO registration = new UserRegistrationDTO("Juan", "Perez", "juan@test.com", "123456789", "Colombia",
+        UserRegistrationDTO registration = new UserRegistrationDTO(
+                "Juan", "Perez", "juan@test.com", "123456789", "Colombia",
                 "Bogota", "Calle 1");
         UserResponseDTO response = new UserResponseDTO(1L, "Juan", "juan@test.com", "Colombia, Bogota, Calle 1",
                 "CUSTOMER");

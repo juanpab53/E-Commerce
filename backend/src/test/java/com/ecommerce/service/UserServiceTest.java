@@ -1,18 +1,21 @@
 package com.ecommerce.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.junit.jupiter.api.Assertions.*;
-import com.ecommerce.dto.UserRegistrationDTO;
-import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.shared.domain.BusinessRuleException;
-import com.ecommerce.shared.domain.NotFoundException;
-import com.ecommerce.shared.domain.valueobject.Address;
-import com.ecommerce.model.Role;
-import com.ecommerce.model.User;
-import com.ecommerce.repository.UserRepository;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+import java.util.Optional;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,8 +25,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.List;
-import java.util.Optional;
+import com.ecommerce.dto.UserRegistrationDTO;
+import com.ecommerce.dto.UserResponseDTO;
+import com.ecommerce.model.Role;
+import com.ecommerce.model.User;
+import com.ecommerce.repository.UserRepository;
+import com.ecommerce.shared.domain.BusinessRuleException;
+import com.ecommerce.shared.domain.NotFoundException;
+import com.ecommerce.shared.domain.valueobject.Address;
 
 @ExtendWith(MockitoExtension.class)
 public class UserServiceTest {
@@ -52,8 +61,8 @@ public class UserServiceTest {
         exampleUser.setLastName("Aparicio");
         exampleUser.setEmail("juan@example.com");
         exampleUser.setPassword("hash_encoded");
-        exampleUser.setRole(Role.CUSTOMER); 
-        exampleUser.setAddress(exampleAddress); 
+        exampleUser.setRole(Role.CUSTOMER);
+        exampleUser.setAddress(exampleAddress);
 
         registrationDTO = new UserRegistrationDTO(
                 "Juan", "Aparicio", "juan@example.com", "password123",
