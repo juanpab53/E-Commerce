@@ -39,4 +39,5 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./backend/target/site/jacoco/jacoco.xml
+          slug: juanpab53/E-Commerce
           fail_ci_if_error: true
