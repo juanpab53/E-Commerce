@@ -18,6 +18,8 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
+import com.ecommerce.identity.domain.User;
+
 @Data
 @Entity
 @Table(name = "orders")

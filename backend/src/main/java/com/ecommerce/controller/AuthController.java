@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.model.User;
+import com.ecommerce.identity.domain.User;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
 

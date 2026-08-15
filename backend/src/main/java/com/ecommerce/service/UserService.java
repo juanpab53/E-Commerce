@@ -10,8 +10,8 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.model.Role;
-import com.ecommerce.model.User;
+import com.ecommerce.identity.domain.Role;
+import com.ecommerce.identity.domain.User;
 import com.ecommerce.repository.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.shared.domain.NotFoundException;

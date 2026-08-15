@@ -23,7 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.model.User;
+import com.ecommerce.identity.domain.User;
 import com.ecommerce.repository.UserRepository;
 
 @SpringBootTest(properties = {
