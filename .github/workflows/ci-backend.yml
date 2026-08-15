@@ -28,6 +28,10 @@ jobs:
           cache: "maven"
 
       - name: Run tests and generate report
+        env:
+          SPRING_DATASOURCE_URL: ${{ secrets.SUPABASE_DB_URL }}
+          SPRING_DATASOURCE_USERNAME: ${{ secrets.SUPABASE_DB_USER }}
+          SPRING_DATASOURCE_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
         run: mvn -f backend/pom.xml clean verify
 
       - name: Upload to Codecov
