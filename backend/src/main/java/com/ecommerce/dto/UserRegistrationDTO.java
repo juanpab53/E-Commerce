@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import com.ecommerce.identity.domain.Role;
+
 public record UserRegistrationDTO(
     @NotBlank(message = "Name is required")
     String name,
@@ -26,5 +28,7 @@ public record UserRegistrationDTO(
     String city,
 
     @NotBlank
-    String street
+    String street,
+
+    Role role
 ) { }

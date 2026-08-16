@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.identity.domain.Role;
 import com.ecommerce.identity.domain.User;
 import com.ecommerce.identity.domain.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
@@ -31,31 +30,6 @@ public class UserService {
                     return passwordEncoder.matches(password, user.getPassword());
                 })
                 .orElse(false);
-    }
-
-    @Transactional
-    public UserResponseDTO registerUser(UserRegistrationDTO userDto) {
-        if (userRepository.existsByEmail(userDto.email())) {
-            throw new BusinessRuleException("The email '" + userDto.email() + "' is already registered.");
-        }
-
-        User user = new User();
-        user.setName(userDto.name());
-        user.setLastName(userDto.lastName());
-        user.setEmail(userDto.email());
-
-        String hash = passwordEncoder.encode(userDto.password());
-        user.setPassword(hash);
-
-        Address address = new Address();
-        address.setStreet(userDto.street());
-        address.setCity(userDto.city());
-        address.setCountry(userDto.country());
-        user.setAddress(address);
-        user.setRole(Role.CUSTOMER);
-
-        User savedUser = userRepository.save(user);
-        return toResponse(savedUser);
     }
 
     @Transactional

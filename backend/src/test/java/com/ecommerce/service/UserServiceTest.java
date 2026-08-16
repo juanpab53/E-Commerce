@@ -8,7 +8,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -66,32 +65,7 @@ public class UserServiceTest {
 
         registrationDTO = new UserRegistrationDTO(
                 "Juan", "Aparicio", "juan@example.com", "password123",
-                "Calle 123", "Medellin", "Colombia");
-    }
-
-    // --- REGISTRATION TESTS ---
-
-    @Test
-    @DisplayName("Should register a user successfully")
-    void registerUserSuccess() {
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode(anyString())).thenReturn("hash_encoded");
-        when(userRepository.save(any(User.class))).thenReturn(exampleUser);
-
-        UserResponseDTO result = userService.registerUser(registrationDTO);
-
-        assertNotNull(result);
-        assertEquals(exampleUser.getEmail(), result.email());
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Should fail registration if the email already exists")
-    void registerUserFailsDuplicateEmail() {
-        when(userRepository.existsByEmail(registrationDTO.email())).thenReturn(true);
-
-        assertThrows(BusinessRuleException.class, () -> userService.registerUser(registrationDTO));
-        verify(userRepository, never()).save(any(User.class));
+                "Calle 123", "Medellin", "Colombia", null);
     }
 
     // --- VALIDATION TESTS ---
@@ -197,7 +171,7 @@ public class UserServiceTest {
     void updateUserFailsDuplicateEmail() {
         UserRegistrationDTO dtoWithNewEmail = new UserRegistrationDTO(
                 "Juan", "Aparicio", "otro@example.com", "password123",
-                "Calle 123", "Medellin", "Colombia");
+                "Calle 123", "Medellin", "Colombia", null);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(exampleUser));
         when(userRepository.existsByEmail("otro@example.com")).thenReturn(true);

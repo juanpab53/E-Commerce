@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
+import com.ecommerce.identity.application.RegisterUserUseCase;
 import com.ecommerce.service.UserService;
 
 @RequiredArgsConstructor
@@ -24,11 +25,13 @@ import com.ecommerce.service.UserService;
 @RequestMapping("/users")
 public class UserController {
 
+    private final RegisterUserUseCase registerUserUseCase;
+
     private final UserService userService;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRegistrationDTO userDto) {
-        UserResponseDTO newUser = userService.registerUser(userDto);
+        UserResponseDTO newUser = registerUserUseCase.execute(userDto);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
