@@ -24,7 +24,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.ecommerce.dto.LoginRequestDTO;
 import com.ecommerce.identity.domain.User;
-import com.ecommerce.repository.UserRepository;
+import com.ecommerce.identity.domain.UserRepository;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",

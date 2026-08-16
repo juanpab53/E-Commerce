@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.ecommerce.identity.domain.User;
-import com.ecommerce.repository.UserRepository;
+import com.ecommerce.identity.domain.UserRepository;
 
 @RequiredArgsConstructor
 @Service

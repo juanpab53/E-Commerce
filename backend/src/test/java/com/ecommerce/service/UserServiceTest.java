@@ -29,7 +29,7 @@ import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
 import com.ecommerce.identity.domain.Role;
 import com.ecommerce.identity.domain.User;
-import com.ecommerce.repository.UserRepository;
+import com.ecommerce.identity.domain.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.shared.domain.valueobject.Address;
