@@ -1,4 +1,4 @@
-package com.ecommerce.service;
+package com.ecommerce.identity.application;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,19 +18,11 @@ import com.ecommerce.shared.domain.valueobject.Address;
 
 @RequiredArgsConstructor
 @Service
-public class UserService {
+public class UserQueryService {
 
     private final UserRepository userRepository;
 
     private final PasswordEncoder passwordEncoder;
-
-    public boolean validateCredentials(String email, String password) {
-        return userRepository.findByEmail(email)
-                .map(user -> {
-                    return passwordEncoder.matches(password, user.getPassword());
-                })
-                .orElse(false);
-    }
 
     @Transactional
     public List<UserResponseDTO> listUsers() {
