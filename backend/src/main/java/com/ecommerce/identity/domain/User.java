@@ -1,4 +1,4 @@
-package com.ecommerce.model;
+package com.ecommerce.identity.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;

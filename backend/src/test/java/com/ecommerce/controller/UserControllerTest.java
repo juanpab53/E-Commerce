@@ -27,7 +27,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.service.UserService;
+import com.ecommerce.identity.application.RegisterUserUseCase;
+import com.ecommerce.identity.application.UserQueryService;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",
@@ -43,7 +44,10 @@ public class UserControllerTest {
     private WebApplicationContext context;
 
     @MockitoBean
-    private UserService userService;
+    private UserQueryService userQueryService;
+
+    @MockitoBean
+    private RegisterUserUseCase registerUserUseCase;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,11 +61,11 @@ public class UserControllerTest {
     void registerUser() throws Exception {
         UserRegistrationDTO registration = new UserRegistrationDTO(
                 "Juan", "Perez", "juan@test.com", "123456789", "Colombia",
-                "Bogota", "Calle 1");
+                "Bogota", "Calle 1", null);
         UserResponseDTO response = new UserResponseDTO(1L, "Juan", "juan@test.com", "Colombia, Bogota, Calle 1",
                 "CUSTOMER");
 
-        when(userService.registerUser(any(UserRegistrationDTO.class))).thenReturn(response);
+        when(registerUserUseCase.execute(any(UserRegistrationDTO.class))).thenReturn(response);
 
         mockMvc.perform(post("/users/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -76,7 +80,7 @@ public class UserControllerTest {
     void listUsers() throws Exception {
         UserResponseDTO user = new UserResponseDTO(1L, "Juan", "juan@test.com", "Colombia, Bogota, Calle 1",
                 "CUSTOMER");
-        when(userService.listUsers()).thenReturn(List.of(user));
+        when(userQueryService.listUsers()).thenReturn(List.of(user));
 
         mockMvc.perform(get("/users"))
                 .andExpect(status().isOk())
@@ -88,7 +92,7 @@ public class UserControllerTest {
     void findById() throws Exception {
         UserResponseDTO response = new UserResponseDTO(1L, "Juan", "juan@test.com", "Colombia, Bogota, Calle 1",
                 "CUSTOMER");
-        when(userService.getUserById(1L)).thenReturn(response);
+        when(userQueryService.getUserById(1L)).thenReturn(response);
 
         mockMvc.perform(get("/users/1"))
                 .andExpect(status().isOk())
@@ -99,12 +103,12 @@ public class UserControllerTest {
     @DisplayName("PUT /users/{id} - Should update a user")
     void updateUser() throws Exception {
         UserRegistrationDTO update = new UserRegistrationDTO("JuanMod", "PerezMod", "juan@test.com", "123456789",
-                "Colombia", "Bogota", "Calle 1");
+                "Colombia", "Bogota", "Calle 1", null);
         UserResponseDTO response = new UserResponseDTO(1L, "JuanMod", "juan@test.com",
                 "Colombia, Bogota, Calle 1",
                 "CUSTOMER");
 
-        when(userService.update(anyLong(), any(UserRegistrationDTO.class))).thenReturn(response);
+        when(userQueryService.update(anyLong(), any(UserRegistrationDTO.class))).thenReturn(response);
 
         mockMvc.perform(put("/users/1")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -116,7 +120,7 @@ public class UserControllerTest {
     @Test
     @DisplayName("DELETE /users/{id} - Should delete a user")
     void deleteUser() throws Exception {
-        doNothing().when(userService).deleteUser(1L);
+        doNothing().when(userQueryService).deleteUser(1L);
 
         mockMvc.perform(delete("/users/1"))
                 .andExpect(status().isNoContent());

@@ -17,43 +17,46 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.service.UserService;
+import com.ecommerce.identity.application.RegisterUserUseCase;
+import com.ecommerce.identity.application.UserQueryService;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
-    private final UserService userService;
+    private final RegisterUserUseCase registerUserUseCase;
+
+    private final UserQueryService userQueryService;
 
     @PostMapping("/register")
     public ResponseEntity<UserResponseDTO> register(@Valid @RequestBody UserRegistrationDTO userDto) {
-        UserResponseDTO newUser = userService.registerUser(userDto);
+        UserResponseDTO newUser = registerUserUseCase.execute(userDto);
         return new ResponseEntity<>(newUser, HttpStatus.CREATED);
     }
 
     @GetMapping
     public ResponseEntity<List<UserResponseDTO>> list() {
-        List<UserResponseDTO> users = userService.listUsers();
+        List<UserResponseDTO> users = userQueryService.listUsers();
         return ResponseEntity.ok(users);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<UserResponseDTO> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserById(id));
+        return ResponseEntity.ok(userQueryService.getUserById(id));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<UserResponseDTO> update(
             @PathVariable Long id,
             @Valid @RequestBody UserRegistrationDTO userDto) {
-        UserResponseDTO updated = userService.update(id, userDto);
+        UserResponseDTO updated = userQueryService.update(id, userDto);
         return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        userService.deleteUser(id);
+        userQueryService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
 }

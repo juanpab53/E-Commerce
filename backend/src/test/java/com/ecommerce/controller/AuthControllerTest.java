@@ -1,13 +1,11 @@
 package com.ecommerce.controller;
 
-import static org.hamcrest.Matchers.containsString;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import java.util.Optional;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,15 +14,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.ecommerce.dto.LoginRequestDTO;
-import com.ecommerce.model.User;
-import com.ecommerce.repository.UserRepository;
+import com.ecommerce.identity.application.LoginUseCase;
+import com.ecommerce.identity.infrastructure.security.LoginResponseDTO;
+import com.ecommerce.shared.domain.BusinessRuleException;
 
 @SpringBootTest(properties = {
         "spring.datasource.url=jdbc:h2:mem:testdb",
@@ -40,10 +38,7 @@ public class AuthControllerTest {
     private WebApplicationContext context;
 
     @MockitoBean
-    private UserRepository userRepository;
-
-    @MockitoBean
-    private PasswordEncoder passwordEncoder;
+    private LoginUseCase loginUseCase;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -57,21 +52,17 @@ public class AuthControllerTest {
     @Test
     @DisplayName("Success case: Login with valid credentials")
     void loginSuccessful() throws Exception {
-        User mockUser = new User();
-        mockUser.setEmail("test@test.com");
-        mockUser.setPassword("hashed_pass");
-        mockUser.setName("Juan");
-
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "123456");
 
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
-        when(passwordEncoder.matches("123456", "hashed_pass")).thenReturn(true);
+        when(loginUseCase.execute(any(LoginRequestDTO.class)))
+                .thenReturn(new LoginResponseDTO("Juan", "token-123", "Login successful"));
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(content().string(containsString("Login successful. Welcome Juan!")));
+                .andExpect(jsonPath("$.token").value("token-123"))
+                .andExpect(jsonPath("$.username").value("Juan"));
     }
 
     @Test
@@ -79,7 +70,8 @@ public class AuthControllerTest {
     void loginUserNotFound() throws Exception {
         LoginRequestDTO request = new LoginRequestDTO("noexiste@test.com", "123456");
 
-        when(userRepository.findByEmail("noexiste@test.com")).thenReturn(Optional.empty());
+        when(loginUseCase.execute(any(LoginRequestDTO.class)))
+                .thenThrow(new BusinessRuleException("Invalid credentials: User not found"));
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -90,14 +82,10 @@ public class AuthControllerTest {
     @Test
     @DisplayName("Error case: Incorrect password")
     void loginWrongPassword() throws Exception {
-        User mockUser = new User();
-        mockUser.setEmail("test@test.com");
-        mockUser.setPassword("hashed_pass");
-
         LoginRequestDTO request = new LoginRequestDTO("test@test.com", "wrong_pass");
 
-        when(userRepository.findByEmail("test@test.com")).thenReturn(Optional.of(mockUser));
-        when(passwordEncoder.matches("wrong_pass", "hashed_pass")).thenReturn(false);
+        when(loginUseCase.execute(any(LoginRequestDTO.class)))
+                .thenThrow(new BusinessRuleException("Invalid credentials: Incorrect password"));
 
         mockMvc.perform(post("/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

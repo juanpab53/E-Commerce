@@ -13,14 +13,14 @@ import com.ecommerce.dto.OrderDTO;
 import com.ecommerce.dto.OrderItemDTO;
 import com.ecommerce.dto.OrderItemResponseDTO;
 import com.ecommerce.dto.OrderResponseDTO;
+import com.ecommerce.identity.domain.User;
+import com.ecommerce.identity.domain.UserRepository;
 import com.ecommerce.model.Order;
 import com.ecommerce.model.OrderItem;
 import com.ecommerce.model.OrderStatus;
 import com.ecommerce.model.Product;
-import com.ecommerce.model.User;
 import com.ecommerce.repository.OrderRepository;
 import com.ecommerce.repository.ProductRepository;
-import com.ecommerce.repository.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.shared.domain.NotFoundException;
 

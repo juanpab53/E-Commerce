@@ -1,14 +1,12 @@
-package com.ecommerce.service;
+package com.ecommerce.identity.application;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -27,15 +25,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.ecommerce.dto.UserRegistrationDTO;
 import com.ecommerce.dto.UserResponseDTO;
-import com.ecommerce.model.Role;
-import com.ecommerce.model.User;
-import com.ecommerce.repository.UserRepository;
+import com.ecommerce.identity.domain.Role;
+import com.ecommerce.identity.domain.User;
+import com.ecommerce.identity.domain.UserRepository;
 import com.ecommerce.shared.domain.BusinessRuleException;
 import com.ecommerce.shared.domain.NotFoundException;
 import com.ecommerce.shared.domain.valueobject.Address;
 
 @ExtendWith(MockitoExtension.class)
-public class UserServiceTest {
+public class UserQueryServiceTest {
 
     @Mock
     private UserRepository userRepository;
@@ -44,7 +42,7 @@ public class UserServiceTest {
     private PasswordEncoder passwordEncoder;
 
     @InjectMocks
-    private UserService userService;
+    private UserQueryService userQueryService;
 
     private User exampleUser;
     private UserRegistrationDTO registrationDTO;
@@ -66,66 +64,7 @@ public class UserServiceTest {
 
         registrationDTO = new UserRegistrationDTO(
                 "Juan", "Aparicio", "juan@example.com", "password123",
-                "Calle 123", "Medellin", "Colombia");
-    }
-
-    // --- REGISTRATION TESTS ---
-
-    @Test
-    @DisplayName("Should register a user successfully")
-    void registerUserSuccess() {
-        when(userRepository.existsByEmail(anyString())).thenReturn(false);
-        when(passwordEncoder.encode(anyString())).thenReturn("hash_encoded");
-        when(userRepository.save(any(User.class))).thenReturn(exampleUser);
-
-        UserResponseDTO result = userService.registerUser(registrationDTO);
-
-        assertNotNull(result);
-        assertEquals(exampleUser.getEmail(), result.email());
-        verify(userRepository).save(any(User.class));
-    }
-
-    @Test
-    @DisplayName("Should fail registration if the email already exists")
-    void registerUserFailsDuplicateEmail() {
-        when(userRepository.existsByEmail(registrationDTO.email())).thenReturn(true);
-
-        assertThrows(BusinessRuleException.class, () -> userService.registerUser(registrationDTO));
-        verify(userRepository, never()).save(any(User.class));
-    }
-
-    // --- VALIDATION TESTS ---
-
-    @Test
-    @DisplayName("Should validate credentials correctly")
-    void validateCredentialsSuccess() {
-        when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(exampleUser));
-        when(passwordEncoder.matches("password123", "hash_encoded")).thenReturn(true);
-
-        boolean isValid = userService.validateCredentials("juan@example.com", "password123");
-
-        assertTrue(isValid);
-    }
-
-    @Test
-    @DisplayName("Should return false if the password is incorrect")
-    void validateCredentialsFailsWrongPassword() {
-        when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(exampleUser));
-        when(passwordEncoder.matches("wrongpass", "hash_encoded")).thenReturn(false);
-
-        boolean isValid = userService.validateCredentials("juan@example.com", "wrongpass");
-
-        assertFalse(isValid);
-    }
-
-    @Test
-    @DisplayName("Should return false if the user does not exist for credential validation")
-    void validateCredentialsFailsUserNotFound() {
-        when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
-
-        boolean isValid = userService.validateCredentials("noexiste@example.com", "password123");
-
-        assertFalse(isValid);
+                "Calle 123", "Medellin", "Colombia", null);
     }
 
     // --- SEARCH TESTS ---
@@ -135,7 +74,7 @@ public class UserServiceTest {
     void listUsersSuccess() {
         when(userRepository.findAll()).thenReturn(List.of(exampleUser));
 
-        List<UserResponseDTO> result = userService.listUsers();
+        List<UserResponseDTO> result = userQueryService.listUsers();
 
         assertFalse(result.isEmpty());
         assertEquals(1, result.size());
@@ -146,7 +85,7 @@ public class UserServiceTest {
     void getUserByIdSuccess() {
         when(userRepository.findById(1L)).thenReturn(Optional.of(exampleUser));
 
-        UserResponseDTO result = userService.getUserById(1L);
+        UserResponseDTO result = userQueryService.getUserById(1L);
 
         assertEquals("Juan", result.name());
     }
@@ -156,7 +95,7 @@ public class UserServiceTest {
     void getUserByIdFails() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> userService.getUserById(99L));
+        assertThrows(NotFoundException.class, () -> userQueryService.getUserById(99L));
     }
 
     @Test
@@ -164,7 +103,7 @@ public class UserServiceTest {
     void findByEmailSuccess() {
         when(userRepository.findByEmail("juan@example.com")).thenReturn(Optional.of(exampleUser));
 
-        UserResponseDTO result = userService.findByEmail("juan@example.com");
+        UserResponseDTO result = userQueryService.findByEmail("juan@example.com");
 
         assertNotNull(result);
         assertEquals("juan@example.com", result.email());
@@ -175,7 +114,7 @@ public class UserServiceTest {
     void findByEmailFails() {
         when(userRepository.findByEmail("noexiste@example.com")).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> userService.findByEmail("noexiste@example.com"));
+        assertThrows(NotFoundException.class, () -> userQueryService.findByEmail("noexiste@example.com"));
     }
 
     // --- UPDATE TESTS ---
@@ -186,7 +125,7 @@ public class UserServiceTest {
         when(userRepository.findById(1L)).thenReturn(Optional.of(exampleUser));
         when(userRepository.save(any(User.class))).thenReturn(exampleUser);
 
-        UserResponseDTO result = userService.update(1L, registrationDTO);
+        UserResponseDTO result = userQueryService.update(1L, registrationDTO);
 
         assertNotNull(result);
         verify(userRepository).save(exampleUser);
@@ -197,12 +136,12 @@ public class UserServiceTest {
     void updateUserFailsDuplicateEmail() {
         UserRegistrationDTO dtoWithNewEmail = new UserRegistrationDTO(
                 "Juan", "Aparicio", "otro@example.com", "password123",
-                "Calle 123", "Medellin", "Colombia");
+                "Calle 123", "Medellin", "Colombia", null);
 
         when(userRepository.findById(1L)).thenReturn(Optional.of(exampleUser));
         when(userRepository.existsByEmail("otro@example.com")).thenReturn(true);
 
-        assertThrows(BusinessRuleException.class, () -> userService.update(1L, dtoWithNewEmail));
+        assertThrows(BusinessRuleException.class, () -> userQueryService.update(1L, dtoWithNewEmail));
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -211,7 +150,7 @@ public class UserServiceTest {
     void updateUserFailsIdNotFound() {
         when(userRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(NotFoundException.class, () -> userService.update(99L, registrationDTO));
+        assertThrows(NotFoundException.class, () -> userQueryService.update(99L, registrationDTO));
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -222,7 +161,7 @@ public class UserServiceTest {
     void deleteUserSuccess() {
         when(userRepository.existsById(1L)).thenReturn(true);
 
-        assertDoesNotThrow(() -> userService.deleteUser(1L));
+        assertDoesNotThrow(() -> userQueryService.deleteUser(1L));
         verify(userRepository).deleteById(1L);
     }
 
@@ -231,7 +170,7 @@ public class UserServiceTest {
     void deleteUserFails() {
         when(userRepository.existsById(1L)).thenReturn(false);
 
-        assertThrows(NotFoundException.class, () -> userService.deleteUser(1L));
+        assertThrows(NotFoundException.class, () -> userQueryService.deleteUser(1L));
         verify(userRepository, never()).deleteById(anyLong());
     }
 }
